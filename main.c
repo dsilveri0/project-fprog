@@ -123,7 +123,6 @@ int main() {
 }
 
 char menu_principal(void) {
-
     char op;
 
         do {
