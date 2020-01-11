@@ -50,6 +50,13 @@ typedef struct {
     float valor_pago;
 } custo;
 
+typedef struct {
+   conta d_conta;
+   projeto d_projeto;
+   servico d_servico;
+   custo d_custo;
+} dados;
+
 int ler_numero(int, int);
 char menu_principal(void);
 //char sub_menu(char);
