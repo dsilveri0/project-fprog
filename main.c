@@ -59,7 +59,7 @@ typedef struct {
 
 int ler_numero(int, int);
 char menu_principal(void);
-//char sub_menu(char);
+//char sub_menu_contas(char);
 int confirmar_saida(void);
 int voltar_atras(void);
 
