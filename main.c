@@ -63,8 +63,8 @@ int confirmar_saida(void);
 int voltar_atras(void);
 //void gravar_dados_ficheiro(dados[], int);
 //int ler_dados_ficheiro(dados[]);
-void mostrar_dados(dados[], int);
-void ler_dados(dados[], int);
+void ler_dados_conta(dados[], int);
+void mostrar_dados_conta(dados[], int);
 
 int main() {
     menu_principal();
@@ -143,7 +143,7 @@ char submenu_contas() {
         switch(op) {
         case '1':
             printf("Registar contas\n");
-
+            //ler_dados_conta()
             break;
         case '2':
             printf("Consultar contas\n");
@@ -175,11 +175,11 @@ int ler_numero(int lim_inf, int lim_sup) {
 }
 
 
-void ler_dados(dados vetor_contas[], int num_contas) {
-   
+void ler_dados_conta(dados vetor_contas[], int num_contas) {
+
 }
 
-void mostrar_dados(dados d_contas[], int num_contas) {
+void mostrar_dados_conta(dados d_contas[], int num_contas) {
 
 }
 
@@ -197,42 +197,3 @@ int confirmar_saida(void) {
 
     return 0;
 }
-
-/* void gravar_dados_ficheiro(t_aluno alunos[], int num_estudantes) {
-    FILE *ficheiro;
-
-    ficheiro = fopen("dados.dat", "wb");
-
-    if (ficheiro == NULL) {
-        printf("Impossivel criar ficheiro.");
-    } else
-        fwrite(&num_estudantes, sizeof(int), 1, ficheiro);
-        fwrite(alunos, sizeof(t_aluno), num_estudantes, ficheiro);
-
-    fclose(ficheiro);
-}
-
-int ler_dados_ficheiro(t_aluno alunos[]) {
-    FILE *ficheiro;
-    int numero_elementos;
-
-    ficheiro = fopen("dados.dat", "rb");
-
-    if (ficheiro == NULL) {
-        printf("Impossivel abrir ficheiro.");
-    } else
-
-        //fseek(ficheiro, 0L, SEEK_END);
-        //printf("\n%d\n", ftell(ficheiro));
-        // Fazer divisão entre ftell e o sizeof do vetor alunos
-
-        fread(&numero_elementos , sizeof(int), 1, ficheiro);
-        fread(alunos, sizeof(t_aluno), numero_elementos, ficheiro);
-
-        // fread, 1º parametro recebe & quando é uma variavel normal.
-        //(não leva & quando é um vetor na posição 1 nem qunado é o terceiro parametro não leva &.
-
-    fclose(ficheiro);
-
-    return numero_elementos;
-} */
