@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 #define NUM_MAX_CONTAS 5
 #define NUM_MAX_PROJETOS 20
 #define NUM_MAX_SERVICOS 50
@@ -58,97 +57,111 @@ typedef struct {
 } dados;
 
 int ler_numero(int, int);
-char menu_principal(void);
-//char sub_menu_contas(char);
+void menu_principal(void);
+char submenu_contas();
 int confirmar_saida(void);
 int voltar_atras(void);
-
 //void gravar_dados_ficheiro(dados[], int);
 //int ler_dados_ficheiro(dados[]);
-
-void mostrar_dados(conta[], int);
-void ler_dados(conta[], int);
+void mostrar_dados(dados[], int);
+void ler_dados(dados[], int);
 
 int main() {
-    int num_contas = 0;
-    char op;
-
-    conta conta[NUM_MAX_CONTAS];
-    //projeto projeto[NUM_MAX_PROJETOS];
-    //servico servico[NUM_MAX_SERVICOS];
-    //custo custo[NUM_MAX_CUSTOS];
-
-    do {
-	    op = menu_principal();
-
-	    switch(op) {
-            case '1':
-                printf("Contas\n");
-
-                ler_dados(conta, num_contas);
-                num_contas++;
-
-                break;
-            case '2':
-                printf("\n\tMostrar Contas\n");
-
-                mostrar_dados(conta, num_contas);
-
-                break;
-            case '3':
-                printf("\n\tServicos\n");
-
-                break;
-            case '4':
-                printf("\n\tEstatisticas\n");
-
-                break;
-            case '5':
-                printf("\n\tGravar dados\n");
-
-                //gravar_dados_ficheiro(estudantes, num_estudantes);
-
-                break;
-            case '6':
-                printf("\n\tLer dados\n");
-
-                //num_estudantes = ler_dados_ficheiro(estudantes);
-
-                break;
-            case '0':
-                confirmar_saida();
-
-                break;
-            default:
-                printf("Introduza uma opcao valida!");
-       	    }
-
-    } while(op != '0');
-
+    menu_principal();
 
     return 0;
 }
 
-char menu_principal(void) {
+void menu_principal(void) {
     char op;
 
-        do {
-            printf("\n\t----- Menu de Opcoes -----\n\n");
-            printf(" 1 - Registar dados de contas\n");
-            printf(" 2 - Mostrar dados de contas\n");
-            /*
-            printf(" 3 - Alterar dados dos estudantes\n");
-            printf(" 4 - Estatisticas\n");
-            printf(" 5 - Gravar dados no ficheiro binario\n");
-            printf(" 6 - Ler dados do ficheiro binario\n");
-            */
-            printf(" 0 - Sair\n");
-            printf("\n\tSelecione uma opcao -> ");
-            scanf(" %c", &op);
-        } while(op != '1' && op != '2' && op != '3' && op != '4' && op != '5' && op != '6' && op != '0');
+    do {
+        printf("\n\t----- Menu de Opcoes -----\n\n");
+        printf(" 1 - CONTAS\n");
+        printf(" 2 - PROJETOS\n");
+        printf(" 3 - SERVICOS\n");
+        printf(" 4 - CUSTOS\n");
+        printf(" 5 - ESTATISTICAS\n");
+        printf(" 6 - GRAVAR EM FICHEIRO\n");
+        printf(" 7 - LER FICHEIRO\n");
+        printf(" 0 - Sair\n");
+        printf("\n\tSelecione uma opcao -> ");
+        scanf(" %c", &op);
+    } while(op != '1' && op != '2' && op != '3' && op != '4' && op != '5' && op != '6' && op != '7' && op != '0');
 
-	return op;
+    do {
+        switch(op) {
+        case '1':
+            printf("SUB-MENU - CONTAS\n");
+            submenu_contas();
+            break;
+        case '2':
+            printf("SUB-MENU - PROJETOS\n");
 
+            break;
+        case '3':
+            printf("SUB-MENU - SERVICOS\n");
+
+            break;
+        case '4':
+            printf("SUB-MENU - CUSTOS\n");
+
+            break;
+        case '5':
+            printf("\n\tEstatisticas\n");
+            break;
+        case '6':
+            printf("\n\tGravar dados\n");
+            //gravar_dados_ficheiro(estudantes, num_estudantes);
+            break;
+        case '7':
+            printf("\n\tLer dados\n");
+            //num_estudantes = ler_dados_ficheiro(estudantes);
+            break;
+        case '0':
+            confirmar_saida();
+            break;
+        default:
+            printf("Introduza uma opcao valida!");
+        }
+    } while(op != '0');
+}
+
+char submenu_contas() {
+    char op;
+
+    do {
+        printf(" 1 - Registar conta\n");
+        printf(" 2 - Consultar conta\n");
+        printf(" 3 - Voltar atras\n");
+        printf(" 0 - Sair\n");
+        printf("\n\tSelecione uma opcao -> ");
+        scanf(" %c", &op);
+    } while(op != '1' && op != '2' && op != '3' && op != '0');
+
+    do {
+        switch(op) {
+        case '1':
+            printf("Registar contas\n");
+
+            break;
+        case '2':
+            printf("Consultar contas\n");
+
+            break;
+        case '3':
+            printf("Voltar atras\n");
+            menu_principal();
+            break;
+        case '0':
+            confirmar_saida();
+            break;
+        default:
+            printf("Introduza uma opcao valida!");
+        }
+    } while(op != '0');
+
+    return 0;
 }
 
 int ler_numero(int lim_inf, int lim_sup) {
@@ -162,35 +175,12 @@ int ler_numero(int lim_inf, int lim_sup) {
 }
 
 
-void ler_dados(conta d_contas[], int num_contas) {
-
-    printf("\nIntroduza o ID de conta: ");
-    d_contas[0].id_conta = ler_numero(1, 5000);
-
-    printf("\nIndique a designacao da conta: ");
-    scanf("%s", d_contas[0].designacao_conta);
-
-    printf("\nIndique a plataforma: ");
-    scanf("%s", d_contas[0].plataforma_fornecedor_servicos);
-
-    printf("\nIndique a organizacao: ");
-    scanf("%s", d_contas[0].organizacao);
-
-    printf("\nIndique o dominio: ");
-    scanf("%s", d_contas[0].dominio);
-
-    printf("\nIntroduza o saldo de conta: ");
-    d_contas[0].saldo_conta = ler_numero(0, 1000000000);
-
+void ler_dados(dados vetor_contas[], int num_contas) {
+   
 }
 
-void mostrar_dados(conta d_contas[], int num_contas) {
-    printf("\nid da conta: %d ", d_contas[0].id_conta);
-    printf("\ndesignacao da conta: %s\n", d_contas[0].designacao_conta);
-    printf("\nplataforma da conta: %s\n", d_contas[0].plataforma_fornecedor_servicos);
-    printf("\norganizacao da conta: %s\n", d_contas[0].organizacao);
-    printf("\ndominio da conta: %s\n", d_contas[0].dominio);
-    printf("\nsaldo da conta: %.2f\n", d_contas[0].saldo_conta);
+void mostrar_dados(dados d_contas[], int num_contas) {
+
 }
 
 int confirmar_saida(void) {
