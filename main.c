@@ -57,43 +57,48 @@ typedef struct {
 } dados;
 
 int ler_numero(int, int);
-void menu_principal(void);
-char submenu_contas();
+char menu_principal(void);
+char submenu_contas(void);
 int confirmar_saida(void);
 int voltar_atras(void);
-//void gravar_dados_ficheiro(dados[], int);
-//int ler_dados_ficheiro(dados[]);
 void ler_dados_conta(dados[], int);
 void mostrar_dados_conta(dados[], int);
 
 int main() {
-    menu_principal();
-
-    return 0;
-}
-
-void menu_principal(void) {
     char op;
 
     do {
-        printf("\n\t----- Menu de Opcoes -----\n\n");
-        printf(" 1 - CONTAS\n");
-        printf(" 2 - PROJETOS\n");
-        printf(" 3 - SERVICOS\n");
-        printf(" 4 - CUSTOS\n");
-        printf(" 5 - ESTATISTICAS\n");
-        printf(" 6 - GRAVAR EM FICHEIRO\n");
-        printf(" 7 - LER FICHEIRO\n");
-        printf(" 0 - Sair\n");
-        printf("\n\tSelecione uma opcao -> ");
-        scanf(" %c", &op);
-    } while(op != '1' && op != '2' && op != '3' && op != '4' && op != '5' && op != '6' && op != '7' && op != '0');
+        op = menu_principal();
 
-    do {
         switch(op) {
         case '1':
             printf("SUB-MENU - CONTAS\n");
-            submenu_contas();
+            char submenu_op;
+
+            do {
+                submenu_op = submenu_contas();
+
+                switch(submenu_op) {
+                case '1':
+                    printf("Registar contas\n");
+                    //ler_dados_conta()
+                    break;
+                case '2':
+                    printf("Consultar contas\n");
+
+                    break;
+                case '3':
+                    printf("Voltar atras\n");
+                    menu_principal();
+                    break;
+                case '0':
+                    confirmar_saida();
+                    break;
+                default:
+                    printf("Introduza uma opcao valida!");
+                }
+            } while(submenu_op != '0');
+
             break;
         case '2':
             printf("SUB-MENU - PROJETOS\n");
@@ -125,9 +130,31 @@ void menu_principal(void) {
             printf("Introduza uma opcao valida!");
         }
     } while(op != '0');
+
+    return 0;
 }
 
-char submenu_contas() {
+char menu_principal(void) {
+    char op;
+
+    do {
+        printf("\n\t----- Menu de Opcoes -----\n\n");
+        printf(" 1 - CONTAS\n");
+        printf(" 2 - PROJETOS\n");
+        printf(" 3 - SERVICOS\n");
+        printf(" 4 - CUSTOS\n");
+        printf(" 5 - ESTATISTICAS\n");
+        printf(" 6 - GRAVAR EM FICHEIRO\n");
+        printf(" 7 - LER FICHEIRO\n");
+        printf(" 0 - Sair\n");
+        printf("\n\tSelecione uma opcao -> ");
+        scanf(" %c", &op);
+    } while(op != '1' && op != '2' && op != '3' && op != '4' && op != '5' && op != '6' && op != '7' && op != '0');
+
+    return op;
+}
+
+char submenu_contas(void) {
     char op;
 
     do {
@@ -139,49 +166,27 @@ char submenu_contas() {
         scanf(" %c", &op);
     } while(op != '1' && op != '2' && op != '3' && op != '0');
 
-    do {
-        switch(op) {
-        case '1':
-            printf("Registar contas\n");
-            //ler_dados_conta()
-            break;
-        case '2':
-            printf("Consultar contas\n");
-
-            break;
-        case '3':
-            printf("Voltar atras\n");
-            menu_principal();
-            break;
-        case '0':
-            confirmar_saida();
-            break;
-        default:
-            printf("Introduza uma opcao valida!");
-        }
-    } while(op != '0');
-
-    return 0;
+    return op;
 }
 
 int ler_numero(int lim_inf, int lim_sup) {
     int num;
 
     do {
-	scanf("%d", &num);
+        scanf("%d", &num);
     } while(num < lim_inf || num > lim_sup);
 
     return num;
 }
 
 
-void ler_dados_conta(dados vetor_contas[], int num_contas) {
+/*void ler_dados_conta(dados vetor_contas[], int num_contas) {
 
 }
 
 void mostrar_dados_conta(dados d_contas[], int num_contas) {
 
-}
+}*/
 
 int confirmar_saida(void) {
     char resposta;
