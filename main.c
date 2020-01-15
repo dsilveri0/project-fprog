@@ -60,7 +60,6 @@ void ler_dados_servico(servico[], int);
 void mostrar_dados_servico(servico[], int);
 void ler_dados_projeto(projeto[],int);
 void mostrar_dados_projeto(projeto[],int);
-int voltar_atras(void);
 char confirmar_saida(void);
 
 int main() {
@@ -70,8 +69,8 @@ int main() {
     int num_contas = 0;
     servico vetor_servico[NUM_MAX_SERVICOS];
     int num_servicos = 0;
-    int num_projetos = 0;
     projeto vetor_projeto[NUM_MAX_PROJETOS];
+    int num_projetos = 0;
 
     do {
         op = menu_principal();
@@ -101,7 +100,9 @@ int main() {
                     break;
                 case '3':
                     printf("\n\tVoltar atras\n");
-                    //menu_principal();
+
+                    submenu_conta_op = '0';
+
                     break;
                 case '0':
                     resposta_submenu_conta = confirmar_saida();
@@ -142,12 +143,14 @@ int main() {
                     break;
                 case '3':
                     printf("\n\tVoltar atras\n");
-                    //menu_principal();
+
+                    submenu_projeto_op = '0';
+
                     break;
                 case '0':
                     resposta_submenu_projeto = confirmar_saida();
 
-                    if (resposta_submenu_conta == 'S' || resposta_submenu_conta == 's'){
+                    if (resposta_submenu_projeto == 'S' || resposta_submenu_projeto == 's'){
                         printf("\nA sair... \n");
                         return 0;
                     }
@@ -156,7 +159,7 @@ int main() {
                 default:
                     printf("\nIntroduza uma opcao valida!");
                 }
-            } while(submenu_conta_op != '0');
+            } while(submenu_projeto_op != '0');
 
             break;
         case '3':
@@ -183,6 +186,8 @@ int main() {
                     break;
                 case '3':
                     printf("\n\tVoltar atras\n");
+
+                    submenu_servico_op = '0';
 
                     break;
                 case '0':
