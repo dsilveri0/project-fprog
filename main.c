@@ -57,7 +57,6 @@ void ler_dados_conta(conta[], int);
 void mostrar_dados_conta(conta[], int);
 void ler_dados_servico(servico[], int);
 void mostrar_dados_servico(servico[], int);
-int voltar_atras(void);
 char confirmar_saida(void);
 
 int main() {
@@ -96,7 +95,8 @@ int main() {
                     break;
                 case '3':
                     printf("\n\tVoltar atras\n");
-                    //menu_principal();
+                    submenu_conta_op = '0';
+                   
                     break;
                 case '0':
                     resposta_submenu_conta = confirmar_saida();
@@ -141,6 +141,7 @@ int main() {
                     break;
                 case '3':
                     printf("\n\tVoltar atras\n");
+                    submenu_servico_op = '0';
 
                     break;
                 case '0':
