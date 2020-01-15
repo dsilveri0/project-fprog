@@ -49,67 +49,76 @@ typedef struct {
     float valor_pago;
 } custo;
 
-typedef struct {
-   conta d_conta;
-   projeto d_projeto;
-   servico d_servico;
-   custo d_custo;
-} dados;
-
-int ler_numero(int, int);
+float ler_numero(int, int);
 char menu_principal(void);
 char submenu_contas(void);
-int confirmar_saida(void);
+char confirmar_saida(void);
 int voltar_atras(void);
-void ler_dados_conta(dados[], int);
-void mostrar_dados_conta(dados[], int);
+void ler_dados_conta(conta[], int);
+void mostrar_dados_conta(conta[], int);
 
 int main() {
     char op;
+    int num_contas = 0;
+    conta vetor_conta[NUM_MAX_CONTAS];
+
 
     do {
         op = menu_principal();
 
         switch(op) {
         case '1':
-            printf("SUB-MENU - CONTAS\n");
+            printf("\n\tSUB-MENU - CONTAS\n");
             char submenu_op;
+            char resposta;
+            char resposta_submenu;
 
             do {
                 submenu_op = submenu_contas();
 
                 switch(submenu_op) {
                 case '1':
-                    printf("Registar contas\n");
-                    //ler_dados_conta()
+                    printf("\n\tRegistar contas\n");
+
+                    ler_dados_conta(vetor_conta, num_contas);
+                    num_contas++;
+
                     break;
                 case '2':
-                    printf("Consultar contas\n");
+                    printf("\n\tConsultar contas\n");
+
+                    mostrar_dados_conta(vetor_conta, num_contas);
 
                     break;
                 case '3':
-                    printf("Voltar atras\n");
-                    menu_principal();
+                    printf("\n\tVoltar atras\n");
+                    //menu_principal();
                     break;
                 case '0':
-                    confirmar_saida();
+                    resposta_submenu = confirmar_saida();
+
+                    if (resposta_submenu == 'S' || resposta_submenu == 's'){
+                        printf("\nA sair... \n");
+                        return 0;
+                    }
+
                     break;
                 default:
-                    printf("Introduza uma opcao valida!");
+                    printf("\nIntroduza uma opcao valida!");
                 }
             } while(submenu_op != '0');
 
             break;
         case '2':
-            printf("SUB-MENU - PROJETOS\n");
+            printf("\n\tSUB-MENU - PROJETOS\n");
 
             break;
         case '3':
-            printf("SUB-MENU - SERVICOS\n");
+            printf("\n\tSUB-MENU - SERVICOS\n");
 
             break;
         case '4':
-            printf("SUB-MENU - CUSTOS\n");
+            printf("\n\tSUB-MENU - CUSTOS\n");
 
             break;
         case '5':
@@ -124,13 +133,19 @@ int main() {
             //num_estudantes = ler_dados_ficheiro(estudantes);
             break;
         case '0':
-            confirmar_saida();
+            resposta = confirmar_saida();
+
+            if (resposta == 'S' || resposta == 's'){
+                printf("A sair... \n");
+                return 0;
+            }
+
             break;
         default:
             printf("Introduza uma opcao valida!");
         }
     } while(op != '0');
-
+   
     return 0;
 }
 
@@ -158,7 +173,7 @@ char submenu_contas(void) {
     char op;
 
     do {
-        printf(" 1 - Registar conta\n");
+        printf("\n 1 - Registar conta\n");
         printf(" 2 - Consultar conta\n");
         printf(" 3 - Voltar atras\n");
         printf(" 0 - Sair\n");
@@ -169,36 +184,65 @@ char submenu_contas(void) {
     return op;
 }
 
-int ler_numero(int lim_inf, int lim_sup) {
-    int num;
+float ler_numero(int lim_inf, int lim_sup) {
+    float num;
 
     do {
-        scanf("%d", &num);
+        scanf("%f", &num);
     } while(num < lim_inf || num > lim_sup);
 
     return num;
 }
 
 
-/*void ler_dados_conta(dados vetor_contas[], int num_contas) {
+/*
 
+typedef struct {
+    int id_conta;
+    char designacao_conta[30];
+    char plataforma_fornecedor_servicos[30];
+    char organizacao[30];
+    char dominio[30];
+    float saldo_conta;
+} conta;
+
+*/
+
+void ler_dados_conta(conta c_vetor[], int c_numero) {
+    c_vetor[c_numero].id_conta = c_numero;
+
+    printf("\nIntroduza a designacao da conta: ");
+    scanf("%s", c_vetor[c_numero].designacao_conta);
+
+    printf("\nIntroduza a plataforma do fornecedor de servicos: ");
+    scanf("%s", c_vetor[c_numero].plataforma_fornecedor_servicos);
+
+    printf("\nIntroduza a organizacao: ");
+    scanf("%s", c_vetor[c_numero].organizacao);
+
+    printf("\nIntroduza o dominio: ");
+    scanf("%s", c_vetor[c_numero].dominio);
+
+    printf("\nIntroduza o saldo da conta: ");
+    c_vetor[c_numero].saldo_conta = ler_numero(0, 100000000);
 }
 
-void mostrar_dados_conta(dados d_contas[], int num_contas) {
+void mostrar_dados_conta(conta c_vetor[], int c_numero) {
+    for(int i = 0; i<c_numero;i++) {
+        printf("\n\nID da conta: %d", c_vetor[i].id_conta);
+        printf("\nDesignacao de conta: %s", c_vetor[i].designacao_conta);
+        printf("\nPlataforma: %s", c_vetor[i].plataforma_fornecedor_servicos);
+        printf("\nOrganizacao: %s", c_vetor[i].organizacao);
+        printf("\nDominio: %s", c_vetor[i].dominio);
+        printf("\nSaldo da conta: %.2f\n", c_vetor[i].saldo_conta);
+    }
+}
 
-}*/
-
-int confirmar_saida(void) {
+char confirmar_saida(void) {
     char resposta;
 
     printf("\nQuer mesmo sair? (S/N): ");
     scanf(" %c", &resposta);
 
-    if (resposta == 'S' || resposta == 's'){
-        printf("A sair... \n");
-        return 0;
-    } else
-        main();
-
-    return 0;
+    return resposta;
 }
