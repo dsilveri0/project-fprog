@@ -399,8 +399,8 @@ void ler_dados_projeto(projeto p_vetor[], int p_numero, conta c_vetor[], int c_n
        scanf("%s", p_vetor[p_numero].equipa_projeto);
 
        printf("\nIndique a data: ");
-       printf("\n*>.> Exemplo 12022020, 12=dia, 02=mes, 2020=ano <.<*");
-       // p_vetor.data_projeto = ler_numero(01012019,32139999); //tipo aqui a data mais pequena e a maior possivel neste ano
+       // Procurar função que determine uma data válida, após introduzida a data no formato DD/MM/YYYY
+       // Não esquecer de mencionar que foi retirada da fonte X ou Y caso o façamos.
 
     } else if(flag == 0) {
         printf("\nConta não existente!\n");
