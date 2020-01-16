@@ -49,12 +49,14 @@ typedef struct {
     float valor_pago;
 } custo;
 
-float ler_numero(int, int);
+// Funções para menus e submenus
 char menu_principal(void);
 char submenu_contas(void);
 char submenu_servicos(void);
 char submenu_projetos(void);
 char submenu_custos(void);
+
+// Funções para ler e mostrar dados
 void ler_dados_conta(conta[], int);
 void mostrar_dados_conta(conta[], int);
 void ler_dados_servico(servico[], int);
@@ -63,6 +65,9 @@ void ler_dados_projeto(projeto[],int, conta[], int);
 void mostrar_dados_projeto(projeto[],int);
 void ler_dados_custo(custo[],int, servico[], int, projeto[], int);
 void mostrar_dados_custo(custo[],int);
+
+// Funções auxiliares
+float ler_numero(int, int);
 char confirmar_saida(void);
 int procurar_projeto(projeto[], int, int);
 int procurar_servico(servico[], int, int);
@@ -117,7 +122,7 @@ int main() {
 
                     if (resposta_submenu_conta == 'S' || resposta_submenu_conta == 's'){
                         printf("\nA sair... \n");
-                        return 0;
+                        op = '0';
                     }
 
                     break;
@@ -160,7 +165,7 @@ int main() {
 
                     if (resposta_submenu_projeto == 'S' || resposta_submenu_projeto == 's'){
                         printf("\nA sair... \n");
-                        return 0;
+                        op = '0';
                     }
 
                     break;
@@ -203,7 +208,7 @@ int main() {
 
                     if (resposta_submenu_servico == 'S' || resposta_submenu_servico == 's'){
                         printf("\nA sair... \n");
-                        return 0;
+                        op = '0';
                     }
 
                     break;
@@ -233,7 +238,7 @@ int main() {
                 case '2':
                     printf("\n\tConsultar consultar\n");
 
-                    mostrar_dados_servico(vetor_servico, num_servicos);
+                    mostrar_dados_custo(vetor_custo, num_custos);
 
                     break;
                 case '3':
@@ -247,7 +252,7 @@ int main() {
 
                     if (resposta_submenu_custo == 'S' || resposta_submenu_custo == 's'){
                         printf("\nA sair... \n");
-                        return 0;
+                        op = '0';
                     }
 
                     break;
@@ -271,9 +276,9 @@ int main() {
         case '0':
             resposta = confirmar_saida();
 
-            if (resposta == 'S' || resposta == 's'){
+            if (resposta != 'N' && resposta != 'n'){
                 printf("A sair... \n");
-                return 0;
+                op = '0';
             }
 
             break;
@@ -309,8 +314,7 @@ char submenu_contas(void) {
     char op;
 
     do {
-            printf("|------- Menu de Opcoes --------|\n");
-            printf("|*******************************|\n");
+            printf("\n|*******************************|\n");
             printf("|1 - Registar dados de contas   |\n");
             printf("|2 - Mostrar dados de contas    |\n");
             printf("|3 - Voltar atras               |\n");
@@ -326,8 +330,7 @@ char submenu_servicos(void) {
     char op;
 
     do {
-            printf("|-------- Menu de Opcoes --------|\n");
-            printf("|******************************* |\n");
+            printf("\n|******************************* |\n");
             printf("|1 - Registar servico            |\n");
             printf("|2 - Mostrar servicos registrados|\n");
             printf("|3 - Voltar atras                |\n");
@@ -343,8 +346,7 @@ char submenu_projetos(void) {
     char op;
 
         do {
-            printf("|------- Menu de Opcoes --------|\n");
-            printf("|*******************************|\n");
+            printf("\n|*******************************|\n");
             printf("|1 - Registar dados do projeto  |\n");
             printf("|2 - Mostrar dados do projeto   |\n");
             printf("|3 - Voltar atras               |\n");
@@ -361,8 +363,7 @@ char submenu_custos(void) {
     char op;
 
         do {
-            printf("|------- Menu de Opcoes --------|\n");
-            printf("|*******************************|\n");
+            printf("\n|*******************************|\n");
             printf("|1 - Registar dados de custos  |\n");
             printf("|2 - Mostrar dados de custos   |\n");
             printf("|3 - Voltar atras               |\n");
@@ -411,7 +412,7 @@ void mostrar_dados_conta(conta c_vetor[], int c_numero) {
         printf("\nPlataforma: %s", c_vetor[i].plataforma_fornecedor_servicos);
         printf("\nOrganizacao: %s", c_vetor[i].organizacao);
         printf("\nDominio: %s", c_vetor[i].dominio);
-        printf("\nSaldo da conta: %.2f\n", c_vetor[i].saldo_conta);
+        printf("\nSaldo da conta: %.2f $\n", c_vetor[i].saldo_conta);
     }
 }
 
@@ -437,7 +438,7 @@ void mostrar_dados_servico(servico s_vetor[], int s_numero) {
         printf("\nDesignacao do servico: %s", s_vetor[i].designacao_servico);
         printf("\nTipo de servico: %s", s_vetor[i].tipo_servico);
         printf("\nUnidade de medida: %s", s_vetor[i].unidade_medida);
-        printf("\nCusto por unidade: %.2f\n", s_vetor[i].custo_unidade);
+        printf("\nCusto por unidade: %.2f $\n", s_vetor[i].custo_unidade);
     }
 }
 
@@ -479,25 +480,12 @@ void mostrar_dados_projeto(projeto p_vetor[], int p_numero) {
         printf("\nNome do projeto: %s", p_vetor[i].nome_projeto);
         printf("\nDivisao/Equipa: %s", p_vetor[i].equipa_projeto);
         // printf("\nData: %s", p_vetor[i].data_projeto); ignorei para testes
-        printf("\n\n\n");
     }
 }
 
-/*
-
-typedef struct {
-    servico id_do_servico;
-    projeto id_do_projeto;
-    float datahora_inicio_utilizacao;
-    float datahora_fim_utilizacao;
-    float quantidade;
-    float valor_pago;
-} custo;
-
-*/
-
 void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], int s_numero, projeto p_vetor[], int p_numero) {
     int id_projeto, id_servico, flag_p, flag_s = 0;
+    int custo_unidade_servico;
 
     printf("\nIntroduza o ID do serviço associado: ");
 
@@ -508,6 +496,7 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
         for(int i = 0; i < s_numero; i++) {
             if(s_vetor[i].id_servico == id_servico) {
                 custo_vetor[custo_numero].id_do_servico = id_servico;
+                custo_unidade_servico = s_vetor[i].custo_unidade;
             }
         }
 
@@ -523,11 +512,13 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
                 }
             }
 
-            printf("\nIntroduza a data e hora do inicio de utilizacao: ");
-            printf("\nIntroduza a data e hora do fim de utilizacao: ");
+            //printf("\nIntroduza a data e hora do inicio de utilizacao: ");
+            //printf("\nIntroduza a data e hora do fim de utilizacao: ");
 
-            printf("\nIntroduza o valor pago: ");
-            custo_vetor[custo_numero].valor_pago = ler_numero(0, 100000000);
+            printf("\nIntroduza a quantidade utilizada: ");
+            custo_vetor[custo_numero].quantidade = ler_numero(0, 1000000000);
+
+            custo_vetor[custo_numero].valor_pago = custo_vetor[custo_numero].quantidade * custo_unidade_servico;
 
         } else if(flag_p == 0) {
             printf("\nProjeto nao existente!\n");
@@ -537,16 +528,16 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
     }
 }
 
-//void mostrar_dados_custo(conta c_vetor[], int c_numero) {
-//    for(int i = 0; i<c_numero;i++) {
-//        printf("\n\nID da conta: %d", c_vetor[i].id_conta);
-//        printf("\nDesignacao de conta: %s", c_vetor[i].designacao_conta);
-//        printf("\nPlataforma: %s", c_vetor[i].plataforma_fornecedor_servicos);
-//        printf("\nOrganizacao: %s", c_vetor[i].organizacao);
-//        printf("\nDominio: %s", c_vetor[i].dominio);
-//        printf("\nSaldo da conta: %.2f\n", c_vetor[i].saldo_conta);
-//    }
-//}
+void mostrar_dados_custo(custo custo_vetor[], int custo_numero) {
+    for(int i = 0; i<custo_numero;i++) {
+        printf("\n\nID do servico: %d", custo_vetor[i].id_do_servico);
+        printf("\nID do projeto: %d", custo_vetor[i].id_do_projeto);
+        //printf("\nPlataforma: %s", custo_vetor[i].);
+        //printf("\nOrganizacao: %s", c_vetor[i].organizacao);
+        printf("\nQuantidade: %.2f\n", custo_vetor[i].quantidade);
+        printf("\nValor pago: %.2f $\n", custo_vetor[i].valor_pago);
+    }
+}
 
 int procurar_projeto(projeto p_vetor[], int p_numero, int numero) {
     int flag = 0;
@@ -587,7 +578,14 @@ char confirmar_saida(void) {
     char resposta;
 
     printf("\nQuer mesmo sair? (S/N): ");
-    scanf(" %c", &resposta);
+    do {
+        scanf(" %c", &resposta);
+
+        if (resposta != 's' && resposta != 'S' && resposta != 'n' && resposta != 'N') {
+            printf("\nIndique uma opcao valida: ");
+        }
+
+    } while(resposta != 's' && resposta != 'S' && resposta != 'n' && resposta != 'N');
 
     return resposta;
 }
