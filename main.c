@@ -58,9 +58,10 @@ void ler_dados_conta(conta[], int);
 void mostrar_dados_conta(conta[], int);
 void ler_dados_servico(servico[], int);
 void mostrar_dados_servico(servico[], int);
-void ler_dados_projeto(projeto[],int);
+void ler_dados_projeto(projeto[],int, conta[], int);
 void mostrar_dados_projeto(projeto[],int);
 char confirmar_saida(void);
+int procurar_conta(conta[], int, int);
 
 int main() {
     char op;
@@ -131,7 +132,7 @@ int main() {
                 case '1':
                     printf("\n\tRegistar projetos\n");
 
-                    ler_dados_projeto(vetor_projeto, num_projetos);
+                    ler_dados_projeto(vetor_projeto, num_projetos, vetor_conta, num_contas);
                     num_projetos++;
 
                     break;
@@ -349,18 +350,6 @@ void mostrar_dados_conta(conta c_vetor[], int c_numero) {
     }
 }
 
-/*
-
-typedef struct {
-    int id_servico;
-    char designacao_servico[30];
-    char tipo_servico[30];
-    char unidade_medida[30];
-    float custo_unidade;
-} servico;
-
-*/
-
 void ler_dados_servico(servico s_vetor[], int s_numero) {
     s_vetor[s_numero].id_servico = s_numero;
 
@@ -387,23 +376,35 @@ void mostrar_dados_servico(servico s_vetor[], int s_numero) {
     }
 }
 
-void ler_dados_projeto(projeto p_vetor[], int p_numero){
+void ler_dados_projeto(projeto p_vetor[], int p_numero, conta c_vetor[], int c_numero){
 
-    int id_conta;
+    int id_conta, flag = 0;
 
     printf("\nIndique o numero da conta qual o projeto esta associado a: ");
+
     id_conta = ler_numero(0,5);
-    p_vetor[p_numero].id_da_conta = id_conta;
+    flag = procurar_conta(c_vetor, c_numero, id_conta);
 
-    printf("\nIndique o nome do projeto: ");
-    scanf("%s", p_vetor[p_numero].nome_projeto);
+    if(flag == 1) {
+       for(int i = 0; i < c_numero; i++) {
+           if(c_vetor[i].id_conta == id_conta) {
+               p_vetor[p_numero].id_da_conta = id_conta;
+           }
+       }
 
-    printf("\nIndique a divisao/equipa: ");
-    scanf("%s", p_vetor[p_numero].equipa_projeto);
+       printf("\nIndique o nome do projeto: ");
+       scanf("%s", p_vetor[p_numero].nome_projeto);
 
-    printf("\nIndique a data: ");
-    printf("\n*>.> Exemplo 12022020, 12=dia, 02=mes, 2020=ano <.<*");
-   // p_vetor.data_projeto = ler_numero(01012019,32139999); //tipo aqui a data mais pequena e a maior possivel neste ano
+       printf("\nIndique a divisao/equipa: ");
+       scanf("%s", p_vetor[p_numero].equipa_projeto);
+
+       printf("\nIndique a data: ");
+       printf("\n*>.> Exemplo 12022020, 12=dia, 02=mes, 2020=ano <.<*");
+       // p_vetor.data_projeto = ler_numero(01012019,32139999); //tipo aqui a data mais pequena e a maior possivel neste ano
+
+    } else if(flag == 0) {
+        printf("\nConta não existente!\n");
+    }
 }
 
 void mostrar_dados_projeto(projeto p_vetor[], int p_numero) {
@@ -416,6 +417,19 @@ void mostrar_dados_projeto(projeto p_vetor[], int p_numero) {
         printf("\n\n\n");
     }
 }
+
+
+int procurar_conta(conta c_vetor[], int c_numero, int numero) {
+    int flag = 0;
+
+    for(int i = 0; i < c_numero; i++) {
+        if(c_vetor[i].id_conta == numero) {
+            flag = 1;
+        }
+    }
+    return flag;
+}
+
 
 char confirmar_saida(void) {
     char resposta;
