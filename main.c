@@ -46,10 +46,16 @@ typedef struct {
 } servico;
 
 typedef struct {
+    int hora, minuto;
+} horario;
+
+typedef struct {
     int id_do_servico;
     int id_do_projeto;
-    float datahora_inicio_utilizacao;
-    float datahora_fim_utilizacao;
+    data data_inicio;
+    data data_fim;
+    horario horario_inicio;
+    horario horario_fim;
     float quantidade;
     float valor_pago;
 } custo;
@@ -551,7 +557,7 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
             }
         }
 
-        printf("\nIntroduza o ID do projeto: ");
+        printf("\nIntroduza o ID do projeto associado: ");
 
         id_projeto = ler_numero(0, NUM_MAX_PROJETOS);
         flag_p = procurar_projeto(p_vetor, p_numero, id_projeto);
@@ -562,32 +568,64 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
                     custo_vetor[custo_numero].id_do_projeto = id_projeto;
                 }
             }
-/*
-            printf("\nIndique a data de criacao do projeto: \n");
-            int validacao = 1;
+
+            printf("\nIndique a data de INICIO de utilizacao do servico: \n");
+            int validacao_data_inicio = 1;
 
             do {
                 printf("Indique o dia: ");
-                int data_dia = ler_numero(1, 31);
+                int data_dia_inicio = ler_numero(1, 31);
 
                 printf("\nIndique o mes: ");
-                int data_mes = ler_numero(1, 12);
+                int data_mes_inicio = ler_numero(1, 12);
 
                 printf("\nIndique o ano: ");
-                int data_ano = ler_numero(1970, 9999);
+                int data_ano_inicio = ler_numero(1970, 9999);
 
-                validacao = validar_data(data_dia, data_mes, data_ano);
+                validacao_data_inicio = validar_data(data_dia_inicio, data_mes_inicio, data_ano_inicio);
 
-                if(validacao == 1) {
-                    p_vetor[p_numero].data_projeto.dia = data_dia;
-                    p_vetor[p_numero].data_projeto.mes = data_mes;
-                    p_vetor[p_numero].data_projeto.ano = data_ano;
+                if(validacao_data_inicio == 1) {
+                    custo_vetor[custo_numero].data_inicio.dia = data_dia_inicio;
+                    custo_vetor[custo_numero].data_inicio.mes = data_mes_inicio;
+                    custo_vetor[custo_numero].data_inicio.ano = data_ano_inicio;
                 }
 
-            } while (validacao != 1);
-*/
-            //printf("\nIntroduza a data e hora do inicio de utilizacao: ");
-            //printf("\nIntroduza a data e hora do fim de utilizacao: ");
+            } while (validacao_data_inicio != 1);
+
+            char resposta;
+            printf("\nJá possui uma data de FIM de utilização do serviço? (S/N)\n");
+            do {
+                scanf(" %c", &resposta);
+
+                if(resposta == 'S' || resposta == 's') {
+                    printf("\nIndique a data de FIM de utilizacao do servico: \n");
+                    int validacao_data_fim = 1;
+
+                    do {
+                        printf("Indique o dia: ");
+                        int data_dia_fim = ler_numero(1, 31);
+
+                        printf("\nIndique o mes: ");
+                        int data_mes_fim = ler_numero(1, 12);
+
+                        printf("\nIndique o ano: ");
+                        int data_ano_fim = ler_numero(1970, 9999);
+
+                        validacao_data_fim = validar_data(data_dia_fim, data_mes_fim, data_ano_fim);
+
+                        if(validacao_data_fim == 1) {
+                            custo_vetor[custo_numero].data_fim.dia = data_dia_fim;
+                            custo_vetor[custo_numero].data_fim.mes = data_mes_fim;
+                            custo_vetor[custo_numero].data_fim.ano = data_ano_fim;
+                        }
+
+                    } while (validacao_data_fim != 1);
+                } else {
+                    custo_vetor[custo_numero].data_fim.dia = 0;
+                    custo_vetor[custo_numero].data_fim.mes = 0;
+                    custo_vetor[custo_numero].data_fim.ano = 0;
+                }
+            } while(resposta != 'N' && resposta != 'n' && resposta != 's' && resposta != 'S');
 
             printf("\nIntroduza a quantidade utilizada: ");
             custo_vetor[custo_numero].quantidade = ler_numero(0, 1000000000);
@@ -606,8 +644,8 @@ void mostrar_dados_custo(custo custo_vetor[], int custo_numero) {
     for(int i = 0; i<custo_numero;i++) {
         printf("\n\nID do servico: %d", custo_vetor[i].id_do_servico);
         printf("\nID do projeto: %d", custo_vetor[i].id_do_projeto);
-        //printf("\nPlataforma: %s", custo_vetor[i].);
-        //printf("\nOrganizacao: %s", c_vetor[i].organizacao);
+        printf("\nData e hora de inicio: %d-%d-%d\n", custo_vetor[i].data_inicio.dia, custo_vetor[i].data_inicio.mes, custo_vetor[i].data_inicio.ano);
+        printf("\nData e hora de fim: %d-%d-%d\n", custo_vetor[i].data_fim.dia, custo_vetor[i].data_fim.mes, custo_vetor[i].data_fim.ano);
         printf("\nQuantidade: %.2f\n", custo_vetor[i].quantidade);
         printf("\nValor pago: %.2f $\n", custo_vetor[i].valor_pago);
     }
