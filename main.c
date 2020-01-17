@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define NUM_MAX_CONTAS 5
 #define NUM_MAX_PROJETOS 20
@@ -25,11 +26,15 @@ typedef struct {
 } conta;
 
 typedef struct {
+    int dia, mes, ano;
+} data;
+
+typedef struct {
     int id_projeto;
     int id_da_conta;
     char nome_projeto[30];
     char equipa_projeto[30];
-    float data_projeto;
+    data data_projeto;
 } projeto;
 
 typedef struct {
@@ -72,6 +77,7 @@ char confirmar_saida(void);
 int procurar_projeto(projeto[], int, int);
 int procurar_servico(servico[], int, int);
 int procurar_conta(conta[], int, int);
+int validar_data(int, int, int);
 
 int main() {
     char op;
@@ -390,13 +396,13 @@ void ler_dados_conta(conta c_vetor[], int c_numero) {
     c_vetor[c_numero].id_conta = c_numero;
 
     printf("\nIntroduza a designacao da conta: ");
-    scanf("%s", c_vetor[c_numero].designacao_conta);
+    scanf(" %30[^\n]", c_vetor[c_numero].designacao_conta);
 
     printf("\nIntroduza a plataforma do fornecedor de servicos: ");
-    scanf("%s", c_vetor[c_numero].plataforma_fornecedor_servicos);
+    scanf(" %30[^\n]", c_vetor[c_numero].plataforma_fornecedor_servicos);
 
     printf("\nIntroduza a organizacao: ");
-    scanf("%s", c_vetor[c_numero].organizacao);
+    scanf(" %30[^\n]", c_vetor[c_numero].organizacao);
 
     printf("\nIntroduza o dominio: ");
     scanf("%s", c_vetor[c_numero].dominio);
@@ -420,13 +426,13 @@ void ler_dados_servico(servico s_vetor[], int s_numero) {
     s_vetor[s_numero].id_servico = s_numero;
 
     printf("\nIntroduza a designacao do servico: ");
-    scanf("%s", s_vetor[s_numero].designacao_servico);
+    scanf(" %30[^\n]", s_vetor[s_numero].designacao_servico);
 
     printf("\nIntroduza o tipo de servico: ");
-    scanf("%s", s_vetor[s_numero].tipo_servico);
+    scanf(" %30[^\n]", s_vetor[s_numero].tipo_servico);
 
     printf("\nIntroduza a unidade de medida: ");
-    scanf("%s", s_vetor[s_numero].unidade_medida);
+    scanf(" %30[^\n]", s_vetor[s_numero].unidade_medida);
 
     printf("\nIntroduza o custo por unidade: ");
     s_vetor[s_numero].custo_unidade = ler_numero(0, 100000000);
@@ -443,8 +449,9 @@ void mostrar_dados_servico(servico s_vetor[], int s_numero) {
 }
 
 void ler_dados_projeto(projeto p_vetor[], int p_numero, conta c_vetor[], int c_numero){
-
     int id_conta, flag = 0;
+
+    p_vetor[p_numero].id_projeto = p_numero;
 
     printf("\nIndique o numero da conta qual o projeto esta associado a: ");
 
@@ -459,18 +466,62 @@ void ler_dados_projeto(projeto p_vetor[], int p_numero, conta c_vetor[], int c_n
        }
 
        printf("\nIndique o nome do projeto: ");
-       scanf("%s", p_vetor[p_numero].nome_projeto);
+       scanf(" %30[^\n]", p_vetor[p_numero].nome_projeto);
 
        printf("\nIndique a divisao/equipa: ");
-       scanf("%s", p_vetor[p_numero].equipa_projeto);
+       scanf(" %30[^\n]", p_vetor[p_numero].equipa_projeto);
 
-       printf("\nIndique a data: ");
-       // Procurar função que determine uma data válida, após introduzida a data no formato DD/MM/YYYY
-       // Não esquecer de mencionar que foi retirada da fonte X ou Y caso o façamos.
+       printf("\nIndique a data de criacao do projeto: \n");
+       int validacao = 1;
+
+       do {
+           printf("Indique o dia: ");
+           int data_dia = ler_numero(1, 31);
+
+           printf("\nIndique o mes: ");
+           int data_mes = ler_numero(1, 12);
+
+           printf("\nIndique o ano: ");
+           int data_ano = ler_numero(1970, 9999);
+
+           validacao = validar_data(data_dia, data_mes, data_ano);
+
+           if(validacao == 1) {
+               p_vetor[p_numero].data_projeto.dia = data_dia;
+               p_vetor[p_numero].data_projeto.mes = data_mes;
+               p_vetor[p_numero].data_projeto.ano = data_ano;
+           }
+
+       } while (validacao != 1);
        
     } else if(flag == 0) {
         printf("\nConta não existente!\n");
     }
+}
+
+int validar_data(int dia, int mes, int ano) {
+    int resposta = 1;
+
+    if(mes == 2) {
+        if(((ano % 4 == 0) && (ano % 100 != 0)) || (ano % 400 == 0)) {
+            if(dia > 29) {
+                printf("\nDia invalido! Ano bissexto!\n");
+                resposta = 0;
+            }
+        } else {
+            if(dia > 28) {
+                printf("\nDia invalido! Mes de 28 dias!\n");
+                resposta = 0;
+            }
+        }
+    } else if(mes == 4 || mes == 6 || mes == 9 || mes == 11) {
+        if(dia > 30) {
+            printf("\nDia invalido! Mes de 30 dias!\n");
+            resposta = 0;
+        }
+    }
+
+    return resposta;
 }
 
 void mostrar_dados_projeto(projeto p_vetor[], int p_numero) {
@@ -479,7 +530,7 @@ void mostrar_dados_projeto(projeto p_vetor[], int p_numero) {
         printf("\nConta Associada: %d", p_vetor[i].id_da_conta);
         printf("\nNome do projeto: %s", p_vetor[i].nome_projeto);
         printf("\nDivisao/Equipa: %s", p_vetor[i].equipa_projeto);
-        // printf("\nData: %s", p_vetor[i].data_projeto); ignorei para testes
+        printf("\nData de criação do projeto: %d-%d-%d\n", p_vetor[i].data_projeto.dia, p_vetor[i].data_projeto.mes, p_vetor[i].data_projeto.ano);
     }
 }
 
@@ -511,7 +562,30 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
                     custo_vetor[custo_numero].id_do_projeto = id_projeto;
                 }
             }
+/*
+            printf("\nIndique a data de criacao do projeto: \n");
+            int validacao = 1;
 
+            do {
+                printf("Indique o dia: ");
+                int data_dia = ler_numero(1, 31);
+
+                printf("\nIndique o mes: ");
+                int data_mes = ler_numero(1, 12);
+
+                printf("\nIndique o ano: ");
+                int data_ano = ler_numero(1970, 9999);
+
+                validacao = validar_data(data_dia, data_mes, data_ano);
+
+                if(validacao == 1) {
+                    p_vetor[p_numero].data_projeto.dia = data_dia;
+                    p_vetor[p_numero].data_projeto.mes = data_mes;
+                    p_vetor[p_numero].data_projeto.ano = data_ano;
+                }
+
+            } while (validacao != 1);
+*/
             //printf("\nIntroduza a data e hora do inicio de utilizacao: ");
             //printf("\nIntroduza a data e hora do fim de utilizacao: ");
 
