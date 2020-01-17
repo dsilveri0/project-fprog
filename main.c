@@ -592,6 +592,13 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
 
             } while (validacao_data_inicio != 1);
 
+            printf("\nIndique a hora de INICIO de utilizacao do servico: \n");
+
+            printf("Indique a hora: ");
+            custo_vetor[custo_numero].horario_inicio.hora = ler_numero(0, 23);
+            printf("Indique o minuto: ");
+            custo_vetor[custo_numero].horario_inicio.minuto = ler_numero(0, 59);
+
             char resposta;
             printf("\nJá possui uma data de FIM de utilização do serviço? (S/N)\n");
             do {
@@ -620,10 +627,20 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
                         }
 
                     } while (validacao_data_fim != 1);
+
+                    printf("\nIndique a hora de FIM de utilizacao do servico: \n");
+
+                    printf("Indique a hora: ");
+                    custo_vetor[custo_numero].horario_fim.hora = ler_numero(0, 23);
+                    printf("Indique o minuto: ");
+                    custo_vetor[custo_numero].horario_fim.minuto = ler_numero(0, 59);
+
                 } else {
                     custo_vetor[custo_numero].data_fim.dia = 0;
                     custo_vetor[custo_numero].data_fim.mes = 0;
                     custo_vetor[custo_numero].data_fim.ano = 0;
+                    custo_vetor[custo_numero].horario_fim.minuto = 0;
+                    custo_vetor[custo_numero].horario_fim.hora = 0;
                 }
             } while(resposta != 'N' && resposta != 'n' && resposta != 's' && resposta != 'S');
 
@@ -644,8 +661,8 @@ void mostrar_dados_custo(custo custo_vetor[], int custo_numero) {
     for(int i = 0; i<custo_numero;i++) {
         printf("\n\nID do servico: %d", custo_vetor[i].id_do_servico);
         printf("\nID do projeto: %d", custo_vetor[i].id_do_projeto);
-        printf("\nData e hora de inicio: %d-%d-%d\n", custo_vetor[i].data_inicio.dia, custo_vetor[i].data_inicio.mes, custo_vetor[i].data_inicio.ano);
-        printf("\nData e hora de fim: %d-%d-%d\n", custo_vetor[i].data_fim.dia, custo_vetor[i].data_fim.mes, custo_vetor[i].data_fim.ano);
+        printf("\nData e hora de inicio: %d-%d-%d as %d:%d\n", custo_vetor[i].data_inicio.dia, custo_vetor[i].data_inicio.mes, custo_vetor[i].data_inicio.ano, custo_vetor[i].horario_inicio.hora, custo_vetor[i].horario_inicio.minuto);
+        printf("\nData e hora de fim: %d-%d-%d as %d:%d\n", custo_vetor[i].data_fim.dia, custo_vetor[i].data_fim.mes, custo_vetor[i].data_fim.ano, custo_vetor[i].horario_fim.hora, custo_vetor[i].horario_fim.minuto);
         printf("\nQuantidade: %.2f\n", custo_vetor[i].quantidade);
         printf("\nValor pago: %.2f $\n", custo_vetor[i].valor_pago);
     }
