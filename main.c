@@ -80,7 +80,7 @@ void ler_dados_servico(servico[], int);
 void mostrar_dados_servico(servico[], int);
 void ler_dados_projeto(projeto[],int, conta[], int);
 void mostrar_dados_projeto(projeto[],int);
-void ler_dados_custo(custo[],int, servico[], int, projeto[], int, sp_cont[], int);
+void ler_dados_custo(custo[],int, servico[], int, projeto[], int, sp_cont[]);
 void mostrar_dados_custo(custo[],int);
 
 // Funções auxiliares
@@ -90,14 +90,19 @@ int procurar_projeto(projeto[], int, int);
 int procurar_servico(servico[], int, int);
 int procurar_conta(conta[], int, int);
 int validar_data(int, int, int);
-void servicos_projeto_cont(sp_cont[], int, int);
+void servicos_projeto_cont(sp_cont[], int);
 
 // Funções para Estatísticas
-void projeto_mais_servicos(custo[], int);
+void projeto_mais_servicos(sp_cont[]);
 void fornecedor_mais_projetos(projeto[], int);
 void servicos_mais_utilizados(custo[], int, servico[], int);
 void custo_total_projeto(custo[], int, projeto[], int);
 void custo_tipo_servico(custo[], int, servico[], int, projeto[], int);
+
+// Funções para ficheiros
+void gravar_dados_ficheiro(conta[], int, projeto[], int, servico[], int, custo[], int, sp_cont[]);
+void ler_dados_ficheiro(int[], conta[], projeto[], servico[], custo[], sp_cont[]);
+
 
 int main() {
     char op;
@@ -110,8 +115,13 @@ int main() {
     int num_projetos = 0;
     custo vetor_custo[NUM_MAX_CUSTOS];
     int num_custos = 0;
+    int vetores_cont[4];
+
+    // Inicialização do vetor com valores -1 em todas as posições.
     sp_cont vetor_sp_cont[NUM_MAX_PROJETOS];
-    int num_sp = 0;
+    for(int i = 0; i < NUM_MAX_PROJETOS; i++) {
+        vetor_sp_cont[i].id_do_projeto = -1;
+    }
 
     do {
         op = menu_principal();
@@ -278,7 +288,7 @@ int main() {
                     printf("\n\tRegistar custos\n");
 
                     if(num_custos < NUM_MAX_CUSTOS) {
-                        ler_dados_custo(vetor_custo, num_custos, vetor_servico, num_servicos, vetor_projeto, num_projetos, vetor_sp_cont, num_sp);
+                        ler_dados_custo(vetor_custo, num_custos, vetor_servico, num_servicos, vetor_projeto, num_projetos, vetor_sp_cont);
                         num_custos++;
                     } else {
                         printf("\nExcedeu o limite de custos!\n");
@@ -315,19 +325,31 @@ int main() {
 
             break;
         case '5':
-            printf("\n\tEstatisticas\n");
+            printf("\nEstatisticas\n");
+
+            printf("\nProjeto com maior numero de servicos: ");
+            projeto_mais_servicos(vetor_sp_cont);
+
             break;
         case '6':
-            printf("\n\tGravar dados\n");
-            //gravar_dados_ficheiro(estudantes, num_estudantes);
+            printf("\nGravar dados\n");
+
+            gravar_dados_ficheiro(vetor_conta, num_contas, vetor_projeto, num_projetos, vetor_servico, num_servicos, vetor_custo, num_custos, vetor_sp_cont);
+
             break;
         case '7':
-            printf("\n\tLer dados\n");
-            //num_estudantes = ler_dados_ficheiro(estudantes);
+            printf("\nLer dados\n");
+
+            ler_dados_ficheiro(vetores_cont, vetor_conta, vetor_projeto, vetor_servico, vetor_custo, vetor_sp_cont);
+
+            num_contas = vetores_cont[0];
+            num_projetos = vetores_cont[1];
+            num_servicos = vetores_cont[2];
+            num_custos = vetores_cont[3];
+
             break;
         case '0':
             resposta = confirmar_saida();
-            printf("\n%c\n", resposta);
 
             if (resposta == 'S' || resposta == 's'){
                 printf("A sair... \n");
@@ -357,7 +379,7 @@ char menu_principal(void) {
         printf(" 5 - ESTATISTICAS\n");
         printf(" 6 - GRAVAR EM FICHEIRO\n");
         printf(" 7 - LER FICHEIRO\n");
-        printf(" 0 - Sair\n");
+        printf(" 0 - SAIR\n");
         printf("\n\tSelecione uma opcao -> ");
         scanf(" %c", &op);
     } while(op < '0' && op > '7');
@@ -622,7 +644,7 @@ void mostrar_dados_projeto(projeto p_vetor[], int p_numero) {
     }
 }
 
-void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], int s_numero, projeto p_vetor[], int p_numero, sp_cont vsp_cont[], int sp_numero) {
+void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], int s_numero, projeto p_vetor[], int p_numero, sp_cont vsp_cont[]) {
     int id_projeto, id_servico, flag_p, flag_s = 0;
     int custo_unidade_servico;
 
@@ -648,8 +670,7 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
             for(int j = 0; j < p_numero; j++) {
                 if(p_vetor[j].id_projeto == id_projeto) {
                     custo_vetor[custo_numero].id_do_projeto = id_projeto;
-                    servicos_projeto_cont(vsp_cont, sp_numero, id_projeto);
-                    sp_numero++;
+                    servicos_projeto_cont(vsp_cont, id_projeto);
                 }
             }
 
@@ -786,36 +807,52 @@ int procurar_conta(conta c_vetor[], int c_numero, int numero) {
     return flag;
 }
 
-void servicos_projeto_cont(sp_cont vetor_sp[], int sp_numero, int id_projeto) {
+void servicos_projeto_cont(sp_cont vetor_sp[], int id_projeto) {
     int flag = 0;
 
     for(int i = 0; i < NUM_MAX_PROJETOS; i++) {
         if (vetor_sp[i].id_do_projeto == id_projeto) {
             vetor_sp[i].numero_servicos++;
             flag = 1;
-        } else {
-            if(flag == 0) {
-                vetor_sp[sp_numero+1].id_do_projeto = id_projeto;
-                vetor_sp[i].numero_servicos++;
+        }
+    }
+
+    if(flag == 0) {
+        for(int i = 0; i < NUM_MAX_PROJETOS; i++) {
+            if(vetor_sp[i].id_do_projeto == -1 && flag == 0) {
+                vetor_sp[i].id_do_projeto = id_projeto;
+                vetor_sp[i].numero_servicos = 1;
+                flag = 1;
             }
         }
     }
 }
 
-void projeto_mais_servicos(custo custo_vetor[], int custo_numero) {
-    int i, j, contador_projetos = 0;
-    if(custo_numero > 0) {
-        for(i = 0; i < custo_numero; i++) {
-            for(j = 0; j < custo_numero; j++) {
-                if(custo_vetor[i].id_do_projeto == custo_vetor[j].id_do_projeto) {
-                    contador_projetos++;
-                }
-            }
+void projeto_mais_servicos(sp_cont vetor_sp[]) {
+    int maior_numero_servicos, id_projeto, multiplos_maximos = -1;
+    for(int i = 0; i < NUM_MAX_PROJETOS; i++) {
+        if(i == 0) {
+            id_projeto = vetor_sp[i].id_do_projeto;
+            maior_numero_servicos = vetor_sp[i].numero_servicos;
         }
-    } else {
-        printf("\nAinda nao foram adicionados custos.\n");
+        else if (vetor_sp[i].numero_servicos > maior_numero_servicos) {
+            id_projeto = vetor_sp[i].id_do_projeto;
+            maior_numero_servicos = vetor_sp[i].numero_servicos;
+            multiplos_maximos = -1;
+        } else if(vetor_sp[i].numero_servicos == maior_numero_servicos) {
+            multiplos_maximos = 1;
+        }
     }
 
+    if(id_projeto == -1) {
+        printf("\nNao existem servicos associados a projetos!\n");
+    } else {
+        if(multiplos_maximos == -1) {
+            printf("\nID do projeto: %d\t Numero de servicos: %d\n", id_projeto, maior_numero_servicos);
+        } else {
+            printf("\nNão existe um projeto com um numero superior de servicos\n");
+        }
+    }
 }
 
 char confirmar_saida(void) {
@@ -825,7 +862,6 @@ char confirmar_saida(void) {
     do {
         fflush(stdin);
         scanf(" %c", &resposta);
-        printf(" %c", resposta);
 
         if (resposta != 's' && resposta != 'S' && resposta != 'n' && resposta != 'N') {
             printf("\nIndique uma opcao valida: ");
@@ -834,4 +870,63 @@ char confirmar_saida(void) {
     } while(resposta != 's' && resposta != 'S' && resposta != 'n' && resposta != 'N');
 
     return resposta;
+}
+
+void gravar_dados_ficheiro(conta c_vetor[], int c_numero, projeto p_vetor[], int p_numero, servico s_vetor[], int s_numero, custo custo_vetor[], int custo_numero, sp_cont sp_vetor[]) {
+    FILE *ficheiro;
+
+    ficheiro = fopen("dados.dat", "wb");
+
+    if (ficheiro == NULL) {
+        printf("Impossivel criar ficheiro.");
+    } else {
+        fwrite(&c_numero, sizeof(int), 1, ficheiro);
+        fwrite(c_vetor, sizeof(conta), c_numero, ficheiro);
+
+        fwrite(&p_numero, sizeof(int), 1, ficheiro);
+        fwrite(p_vetor, sizeof(projeto), p_numero, ficheiro);
+
+        fwrite(&s_numero, sizeof(int), 1, ficheiro);
+        fwrite(s_vetor, sizeof(servico), s_numero, ficheiro);
+
+        fwrite(&custo_numero, sizeof(int), 1, ficheiro);
+        fwrite(custo_vetor, sizeof(custo), custo_numero, ficheiro);
+
+        fwrite(sp_vetor, sizeof(sp_cont), NUM_MAX_PROJETOS, ficheiro);
+    }
+
+    fclose(ficheiro);
+    printf("\nGravados com sucesso!\n");
+}
+
+void ler_dados_ficheiro(int vetores_cont[], conta c_vetor[], projeto p_vetor[], servico s_vetor[], custo custo_vetor[], sp_cont sp_vetor[]) {
+    FILE *ficheiro;
+    int c_numero, p_numero, s_numero, custo_numero;
+
+    ficheiro = fopen("dados.dat", "rb");
+
+    if (ficheiro == NULL) {
+        printf("Impossivel abrir ficheiro.");
+    } else {
+
+        fread(&c_numero, sizeof(int), 1, ficheiro);
+        fread(c_vetor, sizeof(conta), c_numero, ficheiro);
+
+        fread(&p_numero, sizeof(int), 1, ficheiro);
+        fread(p_vetor, sizeof(projeto), p_numero, ficheiro);
+
+        fread(&s_numero, sizeof(int), 1, ficheiro);
+        fread(s_vetor, sizeof(servico), s_numero, ficheiro);
+
+        fread(&custo_numero, sizeof(int), 1, ficheiro);
+        fread(custo_vetor, sizeof(custo), custo_numero, ficheiro);
+
+        fread(sp_vetor, sizeof(sp_cont), NUM_MAX_PROJETOS, ficheiro);
+    }
+    fclose(ficheiro);
+
+    vetores_cont[0] = c_numero;
+    vetores_cont[1] = p_numero;
+    vetores_cont[2] = s_numero;
+    vetores_cont[3] = custo_numero;
 }
