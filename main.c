@@ -61,6 +61,11 @@ typedef struct {
     float valor_pago;
 } custo;
 
+typedef struct {
+    int id_do_projeto;
+    int numero_servicos;
+} sp_cont;
+
 // Funções para menus e submenus
 char menu_principal(void);
 char submenu_contas(void);
@@ -75,7 +80,7 @@ void ler_dados_servico(servico[], int);
 void mostrar_dados_servico(servico[], int);
 void ler_dados_projeto(projeto[],int, conta[], int);
 void mostrar_dados_projeto(projeto[],int);
-void ler_dados_custo(custo[],int, servico[], int, projeto[], int);
+void ler_dados_custo(custo[],int, servico[], int, projeto[], int, sp_cont[], int);
 void mostrar_dados_custo(custo[],int);
 
 // Funções auxiliares
@@ -85,6 +90,7 @@ int procurar_projeto(projeto[], int, int);
 int procurar_servico(servico[], int, int);
 int procurar_conta(conta[], int, int);
 int validar_data(int, int, int);
+void servicos_projeto_cont(sp_cont[], int, int);
 
 // Funções para Estatísticas
 void projeto_mais_servicos(custo[], int);
@@ -104,6 +110,8 @@ int main() {
     int num_projetos = 0;
     custo vetor_custo[NUM_MAX_CUSTOS];
     int num_custos = 0;
+    sp_cont vetor_sp_cont[NUM_MAX_PROJETOS];
+    int num_sp = 0;
 
     do {
         op = menu_principal();
@@ -267,10 +275,10 @@ int main() {
 
                 switch(submenu_custo_op) {
                 case '1':
-                    printf("\n\tRegistar servicos\n");
+                    printf("\n\tRegistar custos\n");
 
                     if(num_custos < NUM_MAX_CUSTOS) {
-                        ler_dados_custo(vetor_custo, num_custos, vetor_servico, num_servicos, vetor_projeto, num_projetos);
+                        ler_dados_custo(vetor_custo, num_custos, vetor_servico, num_servicos, vetor_projeto, num_projetos, vetor_sp_cont, num_sp);
                         num_custos++;
                     } else {
                         printf("\nExcedeu o limite de custos!\n");
@@ -352,7 +360,7 @@ char menu_principal(void) {
         printf(" 0 - Sair\n");
         printf("\n\tSelecione uma opcao -> ");
         scanf(" %c", &op);
-    } while(op != '1' && op != '2' && op != '3' && op != '4' && op != '5' && op != '6' && op != '7' && op != '0');
+    } while(op < '0' && op > '7');
 
     return op;
 }
@@ -361,14 +369,14 @@ char submenu_contas(void) {
     char op;
 
     do {
-            printf("\n|*******************************|\n");
-            printf("|1 - Registar dados de contas   |\n");
-            printf("|2 - Mostrar dados de contas    |\n");
-            printf("|3 - Voltar atras               |\n");
-            printf("|0 - Sair                       |\n");
-            printf("|------------------------------ |\n");
+        printf("\n|*******************************|\n");
+        printf("|1 - Registar dados de contas   |\n");
+        printf("|2 - Mostrar dados de contas    |\n");
+        printf("|3 - Voltar atras               |\n");
+        printf("|0 - Sair                       |\n");
+        printf("|------------------------------ |\n");
         scanf(" %c", &op);
-    } while(op != '1' && op != '2' && op != '3' && op != '0');
+    } while(op < '0' && op > '3');
 
     return op;
 }
@@ -377,50 +385,48 @@ char submenu_servicos(void) {
     char op;
 
     do {
-            printf("\n|******************************* |\n");
-            printf("|1 - Registar servico            |\n");
-            printf("|2 - Mostrar servicos registrados|\n");
-            printf("|3 - Voltar atras                |\n");
-            printf("|0 - Sair                        |\n");
-            printf("|--------------------------------|\n");
+        printf("\n|******************************* |\n");
+        printf("|1 - Registar servico            |\n");
+        printf("|2 - Mostrar servicos registrados|\n");
+        printf("|3 - Voltar atras                |\n");
+        printf("|0 - Sair                        |\n");
+        printf("|--------------------------------|\n");
         scanf(" %c", &op);
-    } while(op != '1' && op != '2' && op != '3' && op != '0');
+    } while(op < '0' && op > '3');
 
     return op;
 }
 
 char submenu_projetos(void) {
     char op;
+    do {
+        printf("\n|*******************************|\n");
+        printf("|1 - Registar dados do projeto  |\n");
+        printf("|2 - Mostrar dados do projeto   |\n");
+        printf("|3 - Voltar atras               |\n");
+        printf("|0 - Sair                       |\n");
+        printf("|------------------------------ |\n");
+        printf("\n\tSelecione uma opcao -> ");
+        scanf(" %c", &op);
+    } while(op < '0' && op > '3');
 
-        do {
-            printf("\n|*******************************|\n");
-            printf("|1 - Registar dados do projeto  |\n");
-            printf("|2 - Mostrar dados do projeto   |\n");
-            printf("|3 - Voltar atras               |\n");
-            printf("|0 - Sair                       |\n");
-            printf("|------------------------------ |\n");
-            printf("\n\tSelecione uma opcao -> ");
-            scanf(" %c", &op);
-        } while(op != '1' && op != '2' && op != '3' && op != '0');
-
-	return op;
+    return op;
 }
 
 char submenu_custos(void) {
     char op;
+    do {
+        printf("\n|*******************************|\n");
+        printf("|1 - Registar dados de custos   |\n");
+        printf("|2 - Mostrar dados de custos    |\n");
+        printf("|3 - Voltar atras               |\n");
+        printf("|0 - Sair                       |\n");
+        printf("|------------------------------ |\n");
+        printf("\n\tSelecione uma opcao -> ");
+        scanf(" %c", &op);
+    } while(op < '0' && op > '3');
 
-        do {
-            printf("\n|*******************************|\n");
-            printf("|1 - Registar dados de custos  |\n");
-            printf("|2 - Mostrar dados de custos   |\n");
-            printf("|3 - Voltar atras               |\n");
-            printf("|0 - Sair                       |\n");
-            printf("|------------------------------ |\n");
-            printf("\n\tSelecione uma opcao -> ");
-            scanf(" %c", &op);
-        } while(op != '1' && op != '2' && op != '3' && op != '0');
-
-	return op;
+    return op;
 }
 
 float ler_numero(int lim_inf, int lim_sup) {
@@ -616,7 +622,7 @@ void mostrar_dados_projeto(projeto p_vetor[], int p_numero) {
     }
 }
 
-void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], int s_numero, projeto p_vetor[], int p_numero) {
+void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], int s_numero, projeto p_vetor[], int p_numero, sp_cont vsp_cont[], int sp_numero) {
     int id_projeto, id_servico, flag_p, flag_s = 0;
     int custo_unidade_servico;
 
@@ -642,6 +648,8 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
             for(int j = 0; j < p_numero; j++) {
                 if(p_vetor[j].id_projeto == id_projeto) {
                     custo_vetor[custo_numero].id_do_projeto = id_projeto;
+                    servicos_projeto_cont(vsp_cont, sp_numero, id_projeto);
+                    sp_numero++;
                 }
             }
 
@@ -777,27 +785,31 @@ int procurar_conta(conta c_vetor[], int c_numero, int numero) {
     }
     return flag;
 }
-/*
 
-typedef struct {
-    int id_do_servico;
-    int id_do_projeto;
-    data data_inicio;
-    data data_fim;
-    horario horario_inicio;
-    horario horario_fim;
-    float quantidade;
-    float valor_pago;
-} custo;
+void servicos_projeto_cont(sp_cont vetor_sp[], int sp_numero, int id_projeto) {
+    int flag = 0;
 
-*/
+    for(int i = 0; i < NUM_MAX_PROJETOS; i++) {
+        if (vetor_sp[i].id_do_projeto == id_projeto) {
+            vetor_sp[i].numero_servicos++;
+            flag = 1;
+        } else {
+            if(flag == 0) {
+                vetor_sp[sp_numero+1].id_do_projeto = id_projeto;
+                vetor_sp[i].numero_servicos++;
+            }
+        }
+    }
+}
 
 void projeto_mais_servicos(custo custo_vetor[], int custo_numero) {
     int i, j, contador_projetos = 0;
     if(custo_numero > 0) {
-        for(i = 0, j = 0; i < custo_numero && j < custo_numero; i++, j++) {
-            if(custo_vetor[i].id_do_projeto == custo_vetor[j].id_do_projeto) {
-                contador_projetos++;
+        for(i = 0; i < custo_numero; i++) {
+            for(j = 0; j < custo_numero; j++) {
+                if(custo_vetor[i].id_do_projeto == custo_vetor[j].id_do_projeto) {
+                    contador_projetos++;
+                }
             }
         }
     } else {
