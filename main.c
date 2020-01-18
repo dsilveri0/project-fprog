@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #define NUM_MAX_CONTAS 5
 #define NUM_MAX_PROJETOS 20
@@ -113,8 +114,12 @@ int main() {
                 case '1':
                     printf("\n\tRegistar contas\n");
 
-                    ler_dados_conta(vetor_conta, num_contas);
-                    num_contas++;
+                        if(num_contas < NUM_MAX_CONTAS) {
+                            ler_dados_conta(vetor_conta, num_contas);
+                            num_contas++;
+                        } else {
+                            printf("\nExcedeu o limite de contas!\n");
+                        }
 
                     break;
                 case '2':
@@ -156,8 +161,12 @@ int main() {
                 case '1':
                     printf("\n\tRegistar projetos\n");
 
-                    ler_dados_projeto(vetor_projeto, num_projetos, vetor_conta, num_contas);
-                    num_projetos++;
+                    if(num_projetos < NUM_MAX_PROJETOS) {
+                        ler_dados_projeto(vetor_projeto, num_projetos, vetor_conta, num_contas);
+                        num_projetos++;
+                    } else {
+                        printf("\nExcedeu o limite de projetos!\n");
+                    }
 
                     break;
                 case '2':
@@ -199,8 +208,12 @@ int main() {
                 case '1':
                     printf("\n\tRegistar servicos\n");
 
-                    ler_dados_servico(vetor_servico, num_servicos);
-                    num_servicos++;
+                    if(num_servicos < NUM_MAX_SERVICOS) {
+                        ler_dados_servico(vetor_servico, num_servicos);
+                        num_servicos++;
+                    } else {
+                        printf("\nExcedeu o limite de servicos!\n");
+                    }
 
                     break;
                 case '2':
@@ -243,8 +256,12 @@ int main() {
                 case '1':
                     printf("\n\tRegistar servicos\n");
 
-                    ler_dados_custo(vetor_custo, num_custos, vetor_servico, num_servicos, vetor_projeto, num_projetos);
-                    num_custos++;
+                    if(num_custos < NUM_MAX_CUSTOS) {
+                        ler_dados_custo(vetor_custo, num_custos, vetor_servico, num_servicos, vetor_projeto, num_projetos);
+                        num_custos++;
+                    } else {
+                        printf("\nExcedeu o limite de custos!\n");
+                    }
 
                     break;
                 case '2':
@@ -287,8 +304,9 @@ int main() {
             break;
         case '0':
             resposta = confirmar_saida();
+            printf("\n%c\n", resposta);
 
-            if (resposta != 'N' && resposta != 'n'){
+            if (resposta == 'S' || resposta == 's'){
                 printf("A sair... \n");
                 op = '0';
             }
@@ -429,16 +447,57 @@ void mostrar_dados_conta(conta c_vetor[], int c_numero) {
 }
 
 void ler_dados_servico(servico s_vetor[], int s_numero) {
+    char tipo_de_servico[3][30] = {{"armazenamento"}, {"processamento"}, {"extras"}};
+    char unidade_de_medida[3][30] = {{"gbyte"}, {"hora"}, {"segundo"}};
+    char resposta_servico[30];
+    char resposta_unidade[30];
+    int resultado_servico = 0;
+    int resultado_unidade = 0;
+
     s_vetor[s_numero].id_servico = s_numero;
 
     printf("\nIntroduza a designacao do servico: ");
     scanf(" %30[^\n]", s_vetor[s_numero].designacao_servico);
 
-    printf("\nIntroduza o tipo de servico: ");
-    scanf(" %30[^\n]", s_vetor[s_numero].tipo_servico);
+    do {
+        printf("\nIntroduza o tipo de servico \n(Processamento, Armazenamento, Extras): ");
+        scanf(" %30[^\n]", resposta_servico);
 
-    printf("\nIntroduza a unidade de medida: ");
-    scanf(" %30[^\n]", s_vetor[s_numero].unidade_medida);
+        for(int j = 0; j < 30; j++) {
+            resposta_servico[j] = tolower(resposta_servico[j]);
+        }
+
+        for(int i = 0; i < 3; i++) {
+            if(strcmp(tipo_de_servico[i], resposta_servico) == 0) {
+                resultado_servico = 1;
+                strcpy(s_vetor[s_numero].tipo_servico, resposta_servico);
+            }
+        }
+
+        if(resultado_servico == 0) {
+            printf("\nTipo de servico invalido!\n");
+        }
+    } while(resultado_servico != 1);
+
+    do {
+        printf("\nIntroduza a unidade de medida \n(Gbyte, Hora, Segundo): ");
+        scanf(" %30[^\n]", resposta_unidade);
+
+        for(int j = 0; j < 30; j++) {
+            resposta_unidade[j] = tolower(resposta_unidade[j]);
+        }
+
+        for(int i = 0; i < 3; i++) {
+            if(strcmp(unidade_de_medida[i], resposta_unidade) == 0) {
+                resultado_unidade = 1;
+                strcpy(s_vetor[s_numero].unidade_medida, resposta_unidade);
+            }
+        }
+
+        if(resultado_unidade == 0) {
+            printf("\nTipo de unidade invalida!\n");
+        }
+    } while(resultado_unidade != 1);
 
     printf("\nIntroduza o custo por unidade: ");
     s_vetor[s_numero].custo_unidade = ler_numero(0, 100000000);
@@ -569,10 +628,10 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
                 }
             }
 
-            printf("\nIndique a data de INICIO de utilizacao do servico: \n");
             int validacao_data_inicio = 1;
 
             do {
+                printf("\nIndique a data de INICIO de utilizacao do servico: \n");
                 printf("Indique o dia: ");
                 int data_dia_inicio = ler_numero(1, 31);
 
@@ -605,10 +664,10 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
                 scanf(" %c", &resposta);
 
                 if(resposta == 'S' || resposta == 's') {
-                    printf("\nIndique a data de FIM de utilizacao do servico: \n");
                     int validacao_data_fim = 1;
 
                     do {
+                        printf("\nIndique a data de FIM de utilizacao do servico: \n");
                         printf("Indique o dia: ");
                         int data_dia_fim = ler_numero(1, 31);
 
