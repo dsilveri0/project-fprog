@@ -86,6 +86,13 @@ int procurar_servico(servico[], int, int);
 int procurar_conta(conta[], int, int);
 int validar_data(int, int, int);
 
+// Funções para Estatísticas
+void projeto_mais_servicos(custo[], int);
+void fornecedor_mais_projetos(projeto[], int);
+void servicos_mais_utilizados(custo[], int, servico[], int);
+void custo_total_projeto(custo[], int, projeto[], int);
+void custo_tipo_servico(custo[], int, servico[], int, projeto[], int);
+
 int main() {
     char op;
     char resposta;
