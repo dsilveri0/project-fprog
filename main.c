@@ -147,6 +147,8 @@ int main() {
                     if (resposta_submenu_conta == 'S' || resposta_submenu_conta == 's'){
                         printf("\nA sair... \n");
                         op = '0';
+                    } else {
+                        op = ' ';
                     }
 
                     break;
@@ -194,6 +196,8 @@ int main() {
                     if (resposta_submenu_projeto == 'S' || resposta_submenu_projeto == 's'){
                         printf("\nA sair... \n");
                         op = '0';
+                    } else {
+                        op = ' ';
                     }
 
                     break;
@@ -241,6 +245,8 @@ int main() {
                     if (resposta_submenu_servico == 'S' || resposta_submenu_servico == 's'){
                         printf("\nA sair... \n");
                         op = '0';
+                    } else {
+                        op = ' ';
                     }
 
                     break;
@@ -289,6 +295,8 @@ int main() {
                     if (resposta_submenu_custo == 'S' || resposta_submenu_custo == 's'){
                         printf("\nA sair... \n");
                         op = '0';
+                    } else {
+                        op = ' ';
                     }
 
                     break;
@@ -316,6 +324,8 @@ int main() {
             if (resposta == 'S' || resposta == 's'){
                 printf("A sair... \n");
                 op = '0';
+            } else {
+                op = ' ';
             }
 
             break;
@@ -767,14 +777,43 @@ int procurar_conta(conta c_vetor[], int c_numero, int numero) {
     }
     return flag;
 }
+/*
 
+typedef struct {
+    int id_do_servico;
+    int id_do_projeto;
+    data data_inicio;
+    data data_fim;
+    horario horario_inicio;
+    horario horario_fim;
+    float quantidade;
+    float valor_pago;
+} custo;
+
+*/
+
+void projeto_mais_servicos(custo custo_vetor[], int custo_numero) {
+    int i, j, contador_projetos = 0;
+    if(custo_numero > 0) {
+        for(i = 0, j = 0; i < custo_numero && j < custo_numero; i++, j++) {
+            if(custo_vetor[i].id_do_projeto == custo_vetor[j].id_do_projeto) {
+                contador_projetos++;
+            }
+        }
+    } else {
+        printf("\nAinda nao foram adicionados custos.\n");
+    }
+
+}
 
 char confirmar_saida(void) {
     char resposta;
 
     printf("\nQuer mesmo sair? (S/N): ");
     do {
+        fflush(stdin);
         scanf(" %c", &resposta);
+        printf(" %c", resposta);
 
         if (resposta != 's' && resposta != 'S' && resposta != 'n' && resposta != 'N') {
             printf("\nIndique uma opcao valida: ");
