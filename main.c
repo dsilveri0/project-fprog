@@ -61,6 +61,7 @@ typedef struct {
     float valor_pago;
 } custo;
 
+// Estruturas auxiliares para cálculo de estatística
 typedef struct {
     int id_do_projeto;
     int numero_servicos;
@@ -75,6 +76,16 @@ typedef struct {
     char tipo_servico[30];
     int numero_utilizacao;
 } su_cont;
+
+typedef struct {
+    int id_projeto;
+    float custo;
+} ctp_cont_aux;
+
+typedef struct {
+    int id_conta;
+    ctp_cont_aux projeto[];
+} ctp_cont;
 
 // Funções para menus e submenus
 char menu_principal(void);
@@ -103,12 +114,13 @@ int validar_data(int, int, int);
 void servicos_projeto_cont(sp_cont[], int);
 void fornecedor_projeto_cont(fp_cont[], char[]);
 void servicos_utilizados_cont(su_cont[], char[]);
+void custo_projeto_cont(ctp_cont[], int, int, float);
 
 // Funções para Estatísticas
 void projeto_mais_servicos(sp_cont[]);
 void fornecedor_mais_projetos(fp_cont[]);
 void servicos_mais_utilizados(su_cont[]);
-void custo_total_projeto(custo[], int, projeto[], int);
+void custo_total_projeto(ctp_cont[]);
 void custo_tipo_servico(custo[], int, servico[], int, projeto[], int);
 
 // Funções para ficheiros
@@ -1010,6 +1022,64 @@ void servicos_mais_utilizados(su_cont vetor_su[]) {
         }
         printf("\n");
 
+    }
+}
+/*
+typedef struct {
+    int id_projeto;
+    float custo;
+} ctp_cont_aux;
+
+typedef struct {
+    int id_conta;
+    ctp_cont_aux projeto[];
+} ctp_cont;
+ */
+
+void custo_projeto_cont(ctp_cont vetor_ctp[], int id_conta, int id_projeto, float custo_projeto) {
+    int flag, flag_c, flag_p = 0;
+    int indice_conta = -1;
+
+    // Quando já existe conta e projeto, é somado o custo do projeto.
+    for(int i = 0; i < NUM_MAX_CONTAS; i++) {
+        if(vetor_ctp[i].id_conta == id_conta) {
+            flag_c = 1;
+            indice_conta = i;
+
+            for(int j = 0; j < NUM_MAX_PROJETOS; j++) {
+                if (vetor_ctp[i].projeto[j].id_projeto == id_projeto) {
+                    vetor_ctp[i].projeto[j].custo += custo_projeto;
+                    flag_p = 1;
+                }
+            }
+        }
+    }
+    // Quando não existe uma conta no vetor, é guardada uma conta, e consequentemente um projeto.
+    if(flag_c == 0) {
+        for(int i = 0; i < NUM_MAX_CONTAS; i++) {
+            if(vetor_ctp[i].id_conta == -1 && flag == 0) {
+                vetor_ctp[i].id_conta = id_conta;
+                flag = 1;
+               
+                for(int j = 0; j < NUM_MAX_PROJETOS; j++) {
+                    if (vetor_ctp[i].projeto[j].id_projeto == -1 && flag == 1) {
+                        vetor_ctp[i].projeto[j].id_projeto = id_projeto;
+                        vetor_ctp[i].projeto[j].custo = custo_projeto;
+                        flag = 2;
+                    }
+                }
+            }
+        }
+    }
+    // Quando existe uma conta mas não existe um projeto guardado.
+    else if(flag_c == 1 && flag_p == 0) {
+        for(int i = 0; i < NUM_MAX_PROJETOS; i++) {
+            if (vetor_ctp[indice_conta].projeto[i].id_projeto == -1 && flag == 1) {
+                vetor_ctp[indice_conta].projeto[i].id_projeto = id_projeto;
+                vetor_ctp[indice_conta].projeto[i].custo = custo_projeto;
+                flag = 2;
+            }
+        }
     }
 }
 
