@@ -83,8 +83,19 @@ typedef struct {
 } ctp_cont_aux;
 
 typedef struct {
+    char tipo_servico[30];
+    float custo;
+} sc_cont;
+
+typedef struct {
+    int id_projeto;
+    sc_cont s_custo;
+} psc_cont;
+
+typedef struct {
     int id_conta;
-    ctp_cont_aux projeto[];
+    ctp_cont_aux projeto[NUM_MAX_PROJETOS];
+    psc_cont servico[];
 } ctp_cont;
 
 // Funções para menus e submenus
@@ -115,6 +126,7 @@ void servicos_projeto_cont(sp_cont[], int);
 void fornecedor_projeto_cont(fp_cont[], char[]);
 void servicos_utilizados_cont(su_cont[], char[]);
 void custo_projeto_cont(ctp_cont[], int, int, float);
+void custo_projetos_pop(ctp_cont[], custo[], int, projeto[], int);
 
 // Funções para Estatísticas
 void projeto_mais_servicos(sp_cont[]);
@@ -146,6 +158,8 @@ int main() {
     for(int i = 0; i < NUM_MAX_PROJETOS; i++) {
         vetor_sp_cont[i].id_do_projeto = -1;
     }
+
+    ctp_cont vetor_ctp_cont[NUM_MAX_CONTAS];
 
     // Inicialização do vetor com caracteres "\0" em todas as posições.
     fp_cont vetor_fp_cont[NUM_MAX_CONTAS];
@@ -370,6 +384,9 @@ int main() {
 
             printf("\nServicos mais utilizados: ");
             servicos_mais_utilizados(vetor_su_cont);
+
+            printf("\nCusto total por projetos em cada conta: ");
+            custo_projetos_pop(vetor_ctp_cont, vetor_custo, num_custos, vetor_projeto, num_projetos);
 
             break;
         case '6':
@@ -1037,7 +1054,7 @@ typedef struct {
  */
 
 void custo_projeto_cont(ctp_cont vetor_ctp[], int id_conta, int id_projeto, float custo_projeto) {
-    int flag, flag_c, flag_p = 0;
+    int flag = 0, flag_c = 0, flag_p = 0;
     int indice_conta = -1;
 
     // Quando já existe conta e projeto, é somado o custo do projeto.
@@ -1060,7 +1077,7 @@ void custo_projeto_cont(ctp_cont vetor_ctp[], int id_conta, int id_projeto, floa
             if(vetor_ctp[i].id_conta == -1 && flag == 0) {
                 vetor_ctp[i].id_conta = id_conta;
                 flag = 1;
-               
+
                 for(int j = 0; j < NUM_MAX_PROJETOS; j++) {
                     if (vetor_ctp[i].projeto[j].id_projeto == -1 && flag == 1) {
                         vetor_ctp[i].projeto[j].id_projeto = id_projeto;
@@ -1074,10 +1091,49 @@ void custo_projeto_cont(ctp_cont vetor_ctp[], int id_conta, int id_projeto, floa
     // Quando existe uma conta mas não existe um projeto guardado.
     else if(flag_c == 1 && flag_p == 0) {
         for(int i = 0; i < NUM_MAX_PROJETOS; i++) {
-            if (vetor_ctp[indice_conta].projeto[i].id_projeto == -1 && flag == 1) {
+            if (vetor_ctp[indice_conta].projeto[i].id_projeto == -1 && flag == 0) {
                 vetor_ctp[indice_conta].projeto[i].id_projeto = id_projeto;
                 vetor_ctp[indice_conta].projeto[i].custo = custo_projeto;
-                flag = 2;
+                flag = 1;
+            }
+        }
+    }
+}
+
+void custo_projetos_pop(ctp_cont ctp_vetor[], custo custo_vetor[], int custo_numero, projeto p_vetor[], int p_numero) {
+    int id_conta, id_projeto;
+    float custo;
+
+    for(int i = 0; i < NUM_MAX_CONTAS; i++) {
+        ctp_vetor[i].id_conta = -1;
+
+        for(int j = 0; j < NUM_MAX_PROJETOS; j++) {
+            ctp_vetor[i].projeto[j].id_projeto = -1;
+        }
+    }
+
+    for(int i = 0; i < custo_numero; i++) {
+        id_projeto = custo_vetor[i].id_do_projeto;
+        custo = custo_vetor[i].valor_pago;
+
+        for(int j = 0; j < p_numero; j++) {
+            if(p_vetor[j].id_projeto == id_projeto) {
+                id_conta = p_vetor[j].id_da_conta;
+            }
+        }
+
+        custo_projeto_cont(ctp_vetor, id_conta, id_projeto, custo);
+    }
+
+    for(int i = 0; i < NUM_MAX_CONTAS; i++) {
+        if(ctp_vetor[i].id_conta != -1) {
+            printf("\n----------------------------------------");
+            printf("\nID da conta: %d", ctp_vetor[i].id_conta);
+        }
+        for(int j = 0; j < NUM_MAX_PROJETOS; j++) {
+            if(ctp_vetor[i].projeto[j].id_projeto != -1) {
+                printf("\nID do projeto: %d", ctp_vetor[i].projeto[j].id_projeto);
+                printf("\nCusto total: %.2f $\n", ctp_vetor[i].projeto[j].custo);
             }
         }
     }
