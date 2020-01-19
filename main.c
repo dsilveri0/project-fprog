@@ -71,6 +71,11 @@ typedef struct {
     int numero_projetos;
 } fp_cont;
 
+typedef struct {
+    char tipo_servico[30];
+    int numero_utilizacao;
+} su_cont;
+
 // Funções para menus e submenus
 char menu_principal(void);
 char submenu_contas(void);
@@ -85,7 +90,7 @@ void ler_dados_servico(servico[], int);
 void mostrar_dados_servico(servico[], int);
 void ler_dados_projeto(projeto[],int, conta[], int, fp_cont[]);
 void mostrar_dados_projeto(projeto[],int);
-void ler_dados_custo(custo[],int, servico[], int, projeto[], int, sp_cont[]);
+void ler_dados_custo(custo[],int, servico[], int, projeto[], int, sp_cont[], su_cont[]);
 void mostrar_dados_custo(custo[],int);
 
 // Funções auxiliares
@@ -97,17 +102,18 @@ int procurar_conta(conta[], int, int);
 int validar_data(int, int, int);
 void servicos_projeto_cont(sp_cont[], int);
 void fornecedor_projeto_cont(fp_cont[], char[]);
+void servicos_utilizados_cont(su_cont[], char[]);
 
 // Funções para Estatísticas
 void projeto_mais_servicos(sp_cont[]);
 void fornecedor_mais_projetos(fp_cont[]);
-void servicos_mais_utilizados(custo[], int, servico[], int);
+void servicos_mais_utilizados(su_cont[]);
 void custo_total_projeto(custo[], int, projeto[], int);
 void custo_tipo_servico(custo[], int, servico[], int, projeto[], int);
 
 // Funções para ficheiros
-void gravar_dados_ficheiro(conta[], int, projeto[], int, servico[], int, custo[], int, sp_cont[], fp_cont[]);
-void ler_dados_ficheiro(int[], conta[], projeto[], servico[], custo[], sp_cont[], fp_cont[]);
+void gravar_dados_ficheiro(conta[], int, projeto[], int, servico[], int, custo[], int, sp_cont[], fp_cont[], su_cont[]);
+void ler_dados_ficheiro(int[], conta[], projeto[], servico[], custo[], sp_cont[], fp_cont[], su_cont[]);
 
 
 int main() {
@@ -129,8 +135,14 @@ int main() {
         vetor_sp_cont[i].id_do_projeto = -1;
     }
 
+    // Inicialização do vetor com caracteres "\0" em todas as posições.
     fp_cont vetor_fp_cont[NUM_MAX_CONTAS];
     for(int i = 0; i < NUM_MAX_CONTAS; i++) {
+        strcpy(vetor_fp_cont[i].nome_fornecedor, "\0");
+    }
+
+    su_cont vetor_su_cont[NUM_MAX_SERVICOS];
+    for(int i = 0; i < NUM_MAX_SERVICOS; i++) {
         strcpy(vetor_fp_cont[i].nome_fornecedor, "\0");
     }
 
@@ -299,7 +311,7 @@ int main() {
                     printf("\n\tRegistar custos\n");
 
                     if(num_custos < NUM_MAX_CUSTOS) {
-                        ler_dados_custo(vetor_custo, num_custos, vetor_servico, num_servicos, vetor_projeto, num_projetos, vetor_sp_cont);
+                        ler_dados_custo(vetor_custo, num_custos, vetor_servico, num_servicos, vetor_projeto, num_projetos, vetor_sp_cont, vetor_su_cont);
                         num_custos++;
                     } else {
                         printf("\nExcedeu o limite de custos!\n");
@@ -344,17 +356,20 @@ int main() {
             printf("\nFornecedor com maior numero de projetos: ");
             fornecedor_mais_projetos(vetor_fp_cont);
 
+            printf("\nServicos mais utilizados: ");
+            servicos_mais_utilizados(vetor_su_cont);
+
             break;
         case '6':
-            printf("\nGravar dados\n");
+            printf("\nA gravar dados...");
 
-            gravar_dados_ficheiro(vetor_conta, num_contas, vetor_projeto, num_projetos, vetor_servico, num_servicos, vetor_custo, num_custos, vetor_sp_cont, vetor_fp_cont);
+            gravar_dados_ficheiro(vetor_conta, num_contas, vetor_projeto, num_projetos, vetor_servico, num_servicos, vetor_custo, num_custos, vetor_sp_cont, vetor_fp_cont, vetor_su_cont);
 
             break;
         case '7':
-            printf("\nLer dados\n");
+            printf("\nA ler dados...");
 
-            ler_dados_ficheiro(vetores_cont, vetor_conta, vetor_projeto, vetor_servico, vetor_custo, vetor_sp_cont, vetor_fp_cont);
+            ler_dados_ficheiro(vetores_cont, vetor_conta, vetor_projeto, vetor_servico, vetor_custo, vetor_sp_cont, vetor_fp_cont, vetor_su_cont);
 
             num_contas = vetores_cont[0];
             num_projetos = vetores_cont[1];
@@ -659,9 +674,10 @@ void mostrar_dados_projeto(projeto p_vetor[], int p_numero) {
     }
 }
 
-void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], int s_numero, projeto p_vetor[], int p_numero, sp_cont vsp_cont[]) {
+void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], int s_numero, projeto p_vetor[], int p_numero, sp_cont vsp_cont[], su_cont vsu_cont[]) {
     int id_projeto, id_servico, flag_p, flag_s = 0;
     int custo_unidade_servico;
+    char nome_tipo_servico[30] = {'\0'};
 
     printf("\nIntroduza o ID do serviço associado: ");
 
@@ -673,6 +689,7 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
             if(s_vetor[i].id_servico == id_servico) {
                 custo_vetor[custo_numero].id_do_servico = id_servico;
                 custo_unidade_servico = s_vetor[i].custo_unidade;
+                strcpy(nome_tipo_servico, s_vetor[i].tipo_servico);
             }
         }
 
@@ -688,6 +705,7 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
                     servicos_projeto_cont(vsp_cont, id_projeto);
                 }
             }
+            servicos_utilizados_cont(vsu_cont, nome_tipo_servico);
 
             int validacao_data_inicio = 1;
 
@@ -928,25 +946,75 @@ void fornecedor_mais_projetos(fp_cont vetor_fp[]) {
     }
 }
 
-char confirmar_saida(void) {
-    char resposta;
+void servicos_utilizados_cont(su_cont vetor_su[], char nome_servico[]) {
+    int flag = 0;
+    char nome[30];
 
-    printf("\nQuer mesmo sair? (S/N): ");
-    do {
-        fflush(stdin);
-        scanf(" %c", &resposta);
+    for(int i = 0; i < 30; i++) {
+        nome[i] = tolower(nome_servico[i]);
+    }
 
-        if (resposta != 's' && resposta != 'S' && resposta != 'n' && resposta != 'N') {
-            printf("\nIndique uma opcao valida: ");
+    for(int i = 0; i < NUM_MAX_SERVICOS; i++) {
+        if (strcmp(vetor_su[i].tipo_servico, nome) == 0) {
+            vetor_su[i].numero_utilizacao++;
+            flag = 1;
+        }
+    }
+
+    if(flag == 0) {
+        for(int i = 0; i < NUM_MAX_SERVICOS; i++) {
+            if(strcmp(vetor_su[i].tipo_servico, "\0") == 0 && flag == 0) {
+                strcpy(vetor_su[i].tipo_servico, nome);
+                vetor_su[i].numero_utilizacao = 1;
+                flag = 1;
+            }
+        }
+    }
+}
+
+void servicos_mais_utilizados(su_cont vetor_su[]) {
+    int maior_numero_servicos, multiplos_maximos = -1;
+    char nome[30];
+
+    for(int i = 0; i < NUM_MAX_SERVICOS; i++) {
+        if(i == 0) {
+            strcpy(nome, vetor_su[i].tipo_servico);
+            maior_numero_servicos = vetor_su[i].numero_utilizacao;
+        }
+        else if (vetor_su[i].numero_utilizacao > maior_numero_servicos) {
+            strcpy(nome, vetor_su[i].tipo_servico);
+            maior_numero_servicos = vetor_su[i].numero_utilizacao;
+            multiplos_maximos = -1;
+        } else if(vetor_su[i].numero_utilizacao == maior_numero_servicos) {
+            multiplos_maximos = 1;
+        }
+    }
+
+    if(strcmp(nome, "\0") == 0) {
+        printf("\nNao existem servicos a ser utilizados!\n");
+    } else {
+        if(multiplos_maximos == -1) {
+            for(int i = 0; i < 30; i++) {
+                nome[i] = toupper(nome[i]);
+            }
+            printf("\nTipo de servico mais utilizado: %s\nNumero de utilizacoes: %d\n", nome, maior_numero_servicos);
+        } else {
+            printf("\nNao existe um servico com um numero de utilizacoes superior\n");
         }
 
-    } while(resposta != 's' && resposta != 'S' && resposta != 'n' && resposta != 'N');
+        printf("\n\nTotal de utilizacoes de todos os servicos: ");
+        for(int i = 0; i < 3; i++) {
+            if(strcmp(vetor_su[i].tipo_servico, "\0") != 0) {
+                printf("\n  -O servico %s foi utilizado %d vezes.", vetor_su[i].tipo_servico, vetor_su[i].numero_utilizacao);
+            }
+        }
+        printf("\n");
 
-    return resposta;
+    }
 }
 
 void gravar_dados_ficheiro(conta c_vetor[], int c_numero, projeto p_vetor[], int p_numero, servico s_vetor[], int s_numero,
-                           custo custo_vetor[], int custo_numero, sp_cont sp_vetor[], fp_cont fp_vetor[]) {
+                           custo custo_vetor[], int custo_numero, sp_cont sp_vetor[], fp_cont fp_vetor[], su_cont su_vetor[]) {
     FILE *ficheiro;
 
     ficheiro = fopen("dados.dat", "wb");
@@ -968,6 +1036,7 @@ void gravar_dados_ficheiro(conta c_vetor[], int c_numero, projeto p_vetor[], int
 
         fwrite(sp_vetor, sizeof(sp_cont), NUM_MAX_PROJETOS, ficheiro);
         fwrite(fp_vetor, sizeof(fp_cont), NUM_MAX_CONTAS, ficheiro);
+        fwrite(su_vetor, sizeof(su_cont), NUM_MAX_SERVICOS, ficheiro);
     }
 
     fclose(ficheiro);
@@ -975,7 +1044,7 @@ void gravar_dados_ficheiro(conta c_vetor[], int c_numero, projeto p_vetor[], int
 }
 
 void ler_dados_ficheiro(int vetores_cont[], conta c_vetor[], projeto p_vetor[], servico s_vetor[],
-                        custo custo_vetor[], sp_cont sp_vetor[], fp_cont fp_vetor[]) {
+                        custo custo_vetor[], sp_cont sp_vetor[], fp_cont fp_vetor[], su_cont su_vetor[]) {
     FILE *ficheiro;
     int c_numero, p_numero, s_numero, custo_numero;
 
@@ -999,6 +1068,7 @@ void ler_dados_ficheiro(int vetores_cont[], conta c_vetor[], projeto p_vetor[], 
 
         fread(sp_vetor, sizeof(sp_cont), NUM_MAX_PROJETOS, ficheiro);
         fread(fp_vetor, sizeof(fp_cont), NUM_MAX_CONTAS, ficheiro);
+        fread(su_vetor, sizeof(su_cont), NUM_MAX_SERVICOS, ficheiro);
     }
     fclose(ficheiro);
 
@@ -1006,4 +1076,23 @@ void ler_dados_ficheiro(int vetores_cont[], conta c_vetor[], projeto p_vetor[], 
     vetores_cont[1] = p_numero;
     vetores_cont[2] = s_numero;
     vetores_cont[3] = custo_numero;
+
+    printf("\nLidos com sucesso!\n");
+}
+
+char confirmar_saida(void) {
+    char resposta;
+
+    printf("\nQuer mesmo sair? (S/N): ");
+    do {
+        fflush(stdin);
+        scanf(" %c", &resposta);
+
+        if (resposta != 's' && resposta != 'S' && resposta != 'n' && resposta != 'N') {
+            printf("\nIndique uma opcao valida: ");
+        }
+
+    } while(resposta != 's' && resposta != 'S' && resposta != 'n' && resposta != 'N');
+
+    return resposta;
 }
