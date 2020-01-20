@@ -107,11 +107,12 @@ void ler_dados_servico(servico[], int);
 void mostrar_dados_servico(servico[], int);
 void ler_dados_projeto(projeto[],int, conta[], int, fp_cont[]);
 void mostrar_dados_projeto(projeto[],int);
-void ler_dados_custo(custo[],int, servico[], int, projeto[], int, sp_cont[], su_cont[]);
+int ler_dados_custo(custo[],int, servico[], int, projeto[], int, sp_cont[], su_cont[]);
 void mostrar_dados_custo(custo[],int);
 
 // Funções auxiliares
 float ler_numero(int, int);
+int ler_numero_int(int, int);
 char confirmar_saida(void);
 int procurar_projeto(projeto[], int, int);
 int procurar_servico(servico[], int, int);
@@ -323,6 +324,7 @@ int main() {
 
             char submenu_custo_op;
             char resposta_submenu_custo;
+            int controlo = 0;
 
             do {
                 submenu_custo_op = submenu_custos();
@@ -332,8 +334,10 @@ int main() {
                     printf("\n\tRegistar custos\n");
 
                     if(num_custos < NUM_MAX_CUSTOS) {
-                        ler_dados_custo(vetor_custo, num_custos, vetor_servico, num_servicos, vetor_projeto, num_projetos, vetor_sp_cont, vetor_su_cont);
-                        num_custos++;
+                        controlo = ler_dados_custo(vetor_custo, num_custos, vetor_servico, num_servicos, vetor_projeto, num_projetos, vetor_sp_cont, vetor_su_cont);
+                        if(controlo == 0) {
+                            num_custos++;
+                        }
                     } else {
                         printf("\nExcedeu o limite de custos!\n");
                     }
@@ -514,6 +518,16 @@ float ler_numero(int lim_inf, int lim_sup) {
     return num;
 }
 
+int ler_numero_int(int lim_inf, int lim_sup) {
+    int num;
+
+    do {
+        scanf("%d", &num);
+    } while(num < lim_inf || num > lim_sup);
+
+    return num;
+}
+
 void ler_dados_conta(conta c_vetor[], int c_numero) {
     c_vetor[c_numero].id_conta = c_numero;
 
@@ -669,7 +683,7 @@ int validar_data(int dia, int mes, int ano) {
     if(mes == 2) {
         if(((ano % 4 == 0) && (ano % 100 != 0)) || (ano % 400 == 0)) {
             if(dia > 29) {
-                printf("\nDia invalido! Ano bissexto!\n");
+                printf("\nDia invalido! Mes de 29 dias!\n");
                 resposta = 0;
             }
         } else {
@@ -698,9 +712,9 @@ void mostrar_dados_projeto(projeto p_vetor[], int p_numero) {
     }
 }
 
-void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], int s_numero, projeto p_vetor[], int p_numero, sp_cont vsp_cont[], su_cont vsu_cont[]) {
-    int id_projeto, id_servico, flag_p, flag_s = 0;
-    int custo_unidade_servico;
+int ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], int s_numero, projeto p_vetor[], int p_numero, sp_cont vsp_cont[], su_cont vsu_cont[]) {
+    int id_projeto, id_servico, flag_p = 0, flag_s = 0;
+    int custo_unidade_servico, resposta = 0;
     char nome_tipo_servico[30] = {'\0'};
 
     printf("\nIntroduza o ID do serviço associado: ");
@@ -813,19 +827,23 @@ void ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], i
 
         } else if(flag_p == 0) {
             printf("\nProjeto nao existente!\n");
+            resposta = 1;
         }
     } else if(flag_s == 0) {
         printf("\nServico nao existente!\n");
+        resposta = 1;
     }
+
+    return resposta;
 }
 
 void mostrar_dados_custo(custo custo_vetor[], int custo_numero) {
-    for(int i = 0; i<custo_numero;i++) {
+    for(int i = 0; i<custo_numero; i++) {
         printf("\n\nID do servico: %d", custo_vetor[i].id_do_servico);
         printf("\nID do projeto: %d", custo_vetor[i].id_do_projeto);
-        printf("\nData e hora de inicio: %d-%d-%d as %d:%d\n", custo_vetor[i].data_inicio.dia, custo_vetor[i].data_inicio.mes, custo_vetor[i].data_inicio.ano, custo_vetor[i].horario_inicio.hora, custo_vetor[i].horario_inicio.minuto);
-        printf("\nData e hora de fim: %d-%d-%d as %d:%d\n", custo_vetor[i].data_fim.dia, custo_vetor[i].data_fim.mes, custo_vetor[i].data_fim.ano, custo_vetor[i].horario_fim.hora, custo_vetor[i].horario_fim.minuto);
-        printf("\nQuantidade: %.2f\n", custo_vetor[i].quantidade);
+        printf("\nData e hora de inicio: %d-%d-%d as %d:%d", custo_vetor[i].data_inicio.dia, custo_vetor[i].data_inicio.mes, custo_vetor[i].data_inicio.ano, custo_vetor[i].horario_inicio.hora, custo_vetor[i].horario_inicio.minuto);
+        printf("\nData e hora de fim: %d-%d-%d as %d:%d", custo_vetor[i].data_fim.dia, custo_vetor[i].data_fim.mes, custo_vetor[i].data_fim.ano, custo_vetor[i].horario_fim.hora, custo_vetor[i].horario_fim.minuto);
+        printf("\nQuantidade: %.2f", custo_vetor[i].quantidade);
         printf("\nValor pago: %.2f $\n", custo_vetor[i].valor_pago);
     }
 }
@@ -1036,25 +1054,6 @@ void servicos_mais_utilizados(su_cont vetor_su[]) {
 
     }
 }
-/*
-
-typedef struct {
-    char tipo_servico[30];
-    float custo;
-} sc_cont;
-
-typedef struct {
-    int id_projeto;
-    float custo;
-    sc_cont servico_custo[NUM_MAX_CUSTOS];
-} ctp_cont_aux;
-
-typedef struct {
-    int id_conta;
-    ctp_cont_aux projeto[NUM_MAX_PROJETOS];
-} ctp_cont;
-
-*/
 
 void custo_projeto_cont(ctp_cont vetor_ctp[], int id_conta, int id_projeto, float custo_projeto, char tipo_servico[]) {
     int flag = 0, flag_c = 0, flag_p = 0, flag_s = 0;
@@ -1174,7 +1173,7 @@ void custo_projetos_pop(ctp_cont ctp_vetor[], custo custo_vetor[], int custo_num
         }
     }
 
-    printf("\nCusto p/servico, p/projeto em cada conta");
+    printf("\nCusto p/servico, p/projeto em cada conta: ");
     for(int i = 0; i < NUM_MAX_CONTAS; i++) {
         if(ctp_vetor[i].id_conta != -1) {
             printf("\n----------------------------------------");
