@@ -112,7 +112,6 @@ void mostrar_dados_custo(custo[],int);
 
 // Funções auxiliares
 float ler_numero(int, int);
-int ler_numero_int(int, int);
 char confirmar_saida(void);
 int procurar_projeto(projeto[], int, int);
 int procurar_servico(servico[], int, int);
@@ -531,18 +530,10 @@ float ler_numero(int lim_inf, int lim_sup) {
             printf("\nCaracter inválido!\n");
             flag = -1;
         }
+        if(num < lim_inf || num > lim_sup) {
+            printf("Por favor introduza um numero entre %d e %d: ", lim_inf, lim_sup);
+        }
     } while((num < lim_inf || num > lim_sup) || flag == -1);
-    return num;
-}
-
-int ler_numero_int(int lim_inf, int lim_sup) {
-    int num;
-
-    do {
-        fflush(stdin);
-        scanf("%d", &num);
-    } while(num < lim_inf || num > lim_sup);
-
     return num;
 }
 
