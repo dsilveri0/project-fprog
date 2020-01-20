@@ -289,7 +289,7 @@ int main() {
 
                     break;
                 case '2':
-                    printf("\n\tConsultar consultar\n");
+                    printf("\n\tConsultar servicos\n");
 
                     mostrar_dados_servico(vetor_servico, num_servicos);
 
@@ -341,7 +341,7 @@ int main() {
 
                     break;
                 case '2':
-                    printf("\n\tConsultar consultar\n");
+                    printf("\n\tConsultar custos\n");
 
                     mostrar_dados_custo(vetor_custo, num_custos);
 
@@ -527,7 +527,7 @@ float ler_numero(int lim_inf, int lim_sup) {
         fflush(stdin);
         resultado = scanf("%f", &num);
         if(resultado != 1) {
-            printf("\nCaracter inválido!\n");
+            printf("\nCaracter invalido!\n");
             flag = -1;
         }
         if(num < lim_inf || num > lim_sup) {
@@ -691,7 +691,7 @@ int ler_dados_projeto(projeto p_vetor[], int p_numero, conta c_vetor[], int c_nu
        } while (validacao != 1);
        
     } else if(flag == 0) {
-        printf("\nConta não existente!\n");
+        printf("\nConta nao existente!\n");
         resposta = 1;
     }
 
@@ -729,7 +729,7 @@ void mostrar_dados_projeto(projeto p_vetor[], int p_numero) {
         printf("\nConta Associada: %d", p_vetor[i].id_da_conta);
         printf("\nNome do projeto: %s", p_vetor[i].nome_projeto);
         printf("\nDivisao/Equipa: %s", p_vetor[i].equipa_projeto);
-        printf("\nData de criação do projeto: %d-%d-%d\n", p_vetor[i].data_projeto.dia, p_vetor[i].data_projeto.mes, p_vetor[i].data_projeto.ano);
+        printf("\nData de criacao do projeto: %d-%d-%d\n", p_vetor[i].data_projeto.dia, p_vetor[i].data_projeto.mes, p_vetor[i].data_projeto.ano);
     }
 }
 
@@ -738,7 +738,7 @@ int ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], in
     int custo_unidade_servico, resposta = 0;
     char nome_tipo_servico[30] = {'\0'};
 
-    printf("\nIntroduza o ID do serviço associado: ");
+    printf("\nIntroduza o ID do servico associado: ");
 
     id_servico = ler_numero(0, NUM_MAX_SERVICOS);
     flag_s = procurar_servico(s_vetor, s_numero, id_servico);
@@ -797,7 +797,7 @@ int ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], in
             custo_vetor[custo_numero].horario_inicio.minuto = ler_numero(0, 59);
 
             char resposta;
-            printf("\nJá possui uma data de FIM de utilização do serviço? (S/N)\n");
+            printf("\nJa possui uma data de FIM de utilizacao do servico? (S/N)\n");
             do {
                 fflush(stdin);
                 scanf(" %c", &resposta);
@@ -947,7 +947,7 @@ void projeto_mais_servicos(sp_cont vetor_sp[]) {
         if(multiplos_maximos == -1) {
             printf("\n  -ID do projeto: %d\n  -Numero de servicos: %d\n", id_projeto, maior_numero_servicos);
         } else {
-            printf("\n  -Não existe um projeto com um numero superior de servicos\n");
+            printf("\n  -Nao existe um projeto com um numero superior de servicos\n");
         }
     }
 }
@@ -1005,7 +1005,7 @@ void fornecedor_mais_projetos(fp_cont vetor_fp[]) {
             }
             printf("\n  -Nome do fornecedor: %s\n  -Numero de projetos: %d\n", nome, maior_numero_projetos);
         } else {
-            printf("\n  -Não existe um fornecedor com um numero superior de projetos\n");
+            printf("\n  -Nao existe um fornecedor com um numero superior de projetos\n");
         }
     }
 }
