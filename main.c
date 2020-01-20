@@ -384,6 +384,7 @@ int main() {
 
             printf("\nCusto total por projetos em cada conta: ");
             custo_projetos_pop(vetor_ctp_cont, vetor_custo, num_custos, vetor_projeto, num_projetos, vetor_servico, num_servicos);
+            // A estatística de custo por tipo de servico para cada projeto em cada conta encontra-se e é mostrada dentro da função custo_projeto_pop.
 
             break;
         case '6':
@@ -436,6 +437,7 @@ char menu_principal(void) {
         printf(" 7 - LER FICHEIRO\n");
         printf(" 0 - SAIR\n");
         printf("\n\tSelecione uma opcao -> ");
+        fflush(stdin);
         scanf(" %c", &op);
     } while(op < '0' && op > '7');
 
@@ -452,6 +454,7 @@ char submenu_contas(void) {
         printf("|3 - Voltar atras               |\n");
         printf("|0 - Sair                       |\n");
         printf("|------------------------------ |\n");
+        fflush(stdin);
         scanf(" %c", &op);
     } while(op < '0' && op > '3');
 
@@ -468,6 +471,7 @@ char submenu_servicos(void) {
         printf("|3 - Voltar atras                |\n");
         printf("|0 - Sair                        |\n");
         printf("|--------------------------------|\n");
+        fflush(stdin);
         scanf(" %c", &op);
     } while(op < '0' && op > '3');
 
@@ -484,6 +488,7 @@ char submenu_projetos(void) {
         printf("|0 - Sair                       |\n");
         printf("|------------------------------ |\n");
         printf("\n\tSelecione uma opcao -> ");
+        fflush(stdin);
         scanf(" %c", &op);
     } while(op < '0' && op > '3');
 
@@ -500,6 +505,7 @@ char submenu_custos(void) {
         printf("|0 - Sair                       |\n");
         printf("|------------------------------ |\n");
         printf("\n\tSelecione uma opcao -> ");
+        fflush(stdin);
         scanf(" %c", &op);
     } while(op < '0' && op > '3');
 
@@ -508,11 +514,18 @@ char submenu_custos(void) {
 
 float ler_numero(int lim_inf, int lim_sup) {
     float num;
+    int flag = 0;
+    int resultado = 0;
 
     do {
-        scanf("%f", &num);
-    } while(num < lim_inf || num > lim_sup);
-
+        flag = 0;
+        fflush(stdin);
+        resultado = scanf("%f", &num);
+        if(resultado != 1) {
+            printf("\nCaracter inválido!\n");
+            flag = -1;
+        }
+    } while((num < lim_inf || num > lim_sup) || flag == -1);
     return num;
 }
 
@@ -520,6 +533,7 @@ int ler_numero_int(int lim_inf, int lim_sup) {
     int num;
 
     do {
+        fflush(stdin);
         scanf("%d", &num);
     } while(num < lim_inf || num > lim_sup);
 
@@ -530,15 +544,19 @@ void ler_dados_conta(conta c_vetor[], int c_numero) {
     c_vetor[c_numero].id_conta = c_numero;
 
     printf("\nIntroduza a designacao da conta: ");
+    fflush(stdin);
     scanf(" %30[^\n]", c_vetor[c_numero].designacao_conta);
 
     printf("\nIntroduza a plataforma do fornecedor de servicos: ");
+    fflush(stdin);
     scanf(" %30[^\n]", c_vetor[c_numero].plataforma_fornecedor_servicos);
 
     printf("\nIntroduza a organizacao: ");
+    fflush(stdin);
     scanf(" %30[^\n]", c_vetor[c_numero].organizacao);
 
     printf("\nIntroduza o dominio: ");
+    fflush(stdin);
     scanf("%s", c_vetor[c_numero].dominio);
 
     printf("\nIntroduza o saldo da conta: ");
@@ -567,10 +585,12 @@ void ler_dados_servico(servico s_vetor[], int s_numero) {
     s_vetor[s_numero].id_servico = s_numero;
 
     printf("\nIntroduza a designacao do servico: ");
+    fflush(stdin);
     scanf(" %30[^\n]", s_vetor[s_numero].designacao_servico);
 
     do {
         printf("\nIntroduza o tipo de servico \n(Processamento, Armazenamento, Extras): ");
+        fflush(stdin);
         scanf(" %30[^\n]", resposta_servico);
 
         for(int j = 0; j < 30; j++) {
@@ -591,6 +611,7 @@ void ler_dados_servico(servico s_vetor[], int s_numero) {
 
     do {
         printf("\nIntroduza a unidade de medida \n(Gbyte, Hora, Segundo): ");
+        fflush(stdin);
         scanf(" %30[^\n]", resposta_unidade);
 
         for(int j = 0; j < 30; j++) {
@@ -642,9 +663,11 @@ void ler_dados_projeto(projeto p_vetor[], int p_numero, conta c_vetor[], int c_n
        }
 
        printf("\nIndique o nome do projeto: ");
+       fflush(stdin);
        scanf(" %30[^\n]", p_vetor[p_numero].nome_projeto);
 
        printf("\nIndique a divisao/equipa: ");
+       fflush(stdin);
        scanf(" %30[^\n]", p_vetor[p_numero].equipa_projeto);
 
        printf("\nIndique a data de criacao do projeto: \n");
@@ -776,6 +799,7 @@ int ler_dados_custo(custo custo_vetor[], int custo_numero, servico s_vetor[], in
             char resposta;
             printf("\nJá possui uma data de FIM de utilização do serviço? (S/N)\n");
             do {
+                fflush(stdin);
                 scanf(" %c", &resposta);
 
                 if(resposta == 'S' || resposta == 's') {
