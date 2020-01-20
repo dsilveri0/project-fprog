@@ -1078,9 +1078,10 @@ void custo_projeto_cont(ctp_cont vetor_ctp[], int id_conta, int id_projeto, floa
                         }
                         if(flag_s == 0 && h == NUM_MAX_SERVICOS-1) {
                             for(int k = 0; k < NUM_MAX_SERVICOS; k++) {
-                                if(strcmp(vetor_ctp[i].projeto[j].servico_custo[h].tipo_servico, "\0") == 0) {
+                                if(strcmp(vetor_ctp[i].projeto[j].servico_custo[k].tipo_servico, "\0") == 0 && flag_s == 0) {
                                     vetor_ctp[i].projeto[j].servico_custo[k].custo = custo_projeto;
                                     strcpy(vetor_ctp[i].projeto[j].servico_custo[k].tipo_servico, tipo_servico);
+                                    flag_s = 1;
                                 }
                             }
                         }
@@ -1172,6 +1173,27 @@ void custo_projetos_pop(ctp_cont ctp_vetor[], custo custo_vetor[], int custo_num
             }
         }
     }
+
+    printf("\nCusto p/servico, p/projeto em cada conta");
+    for(int i = 0; i < NUM_MAX_CONTAS; i++) {
+        if(ctp_vetor[i].id_conta != -1) {
+            printf("\n----------------------------------------");
+            printf("\nID da conta: %d", ctp_vetor[i].id_conta);
+        }
+        for(int j = 0; j < NUM_MAX_PROJETOS; j++) {
+            if(ctp_vetor[i].projeto[j].id_projeto != -1) {
+                printf("\nID do projeto: %d", ctp_vetor[i].projeto[j].id_projeto);
+
+                for(int h = 0; h < NUM_MAX_SERVICOS; h++) {
+                    if(strcmp(ctp_vetor[i].projeto[j].servico_custo[h].tipo_servico, "\0") != 0) {
+                        printf("\n  -Tipo de servico: %s\n", ctp_vetor[i].projeto[j].servico_custo[h].tipo_servico);
+                        printf("\n  -Custo: %.2f $\n", ctp_vetor[i].projeto[j].servico_custo[h].custo);
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 void gravar_dados_ficheiro(conta c_vetor[], int c_numero, projeto p_vetor[], int p_numero, servico s_vetor[], int s_numero,
