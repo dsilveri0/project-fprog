@@ -105,7 +105,7 @@ void ler_dados_conta(conta[], int);
 void mostrar_dados_conta(conta[], int);
 void ler_dados_servico(servico[], int);
 void mostrar_dados_servico(servico[], int);
-void ler_dados_projeto(projeto[],int, conta[], int, fp_cont[]);
+int ler_dados_projeto(projeto[],int, conta[], int, fp_cont[]);
 void mostrar_dados_projeto(projeto[],int);
 int ler_dados_custo(custo[],int, servico[], int, projeto[], int, sp_cont[], su_cont[]);
 void mostrar_dados_custo(custo[],int);
@@ -171,7 +171,7 @@ int main() {
 
         switch(op) {
         case '1':
-            printf("\n\tSUB-MENU - CONTAS\n");
+            printf("\n\tSUB-MENU - CONTAS");
             char submenu_conta_op;
             char resposta_submenu_conta;
 
@@ -197,7 +197,6 @@ int main() {
 
                     break;
                 case '3':
-                    printf("\n\tVoltar atras\n");
 
                     submenu_conta_op = '0';
 
@@ -220,9 +219,10 @@ int main() {
 
             break;
         case '2':
-            printf("\n\tSUB-MENU - PROJETOS\n");
+            printf("\n\tSUB-MENU - PROJETOS");
             char submenu_projeto_op;
             char resposta_submenu_projeto;
+            int controlo_p = 0;
 
             do {
                 submenu_projeto_op = submenu_projetos();
@@ -232,8 +232,10 @@ int main() {
                     printf("\n\tRegistar projetos\n");
 
                     if(num_projetos < NUM_MAX_PROJETOS) {
-                        ler_dados_projeto(vetor_projeto, num_projetos, vetor_conta, num_contas, vetor_fp_cont);
-                        num_projetos++;
+                        controlo_p = ler_dados_projeto(vetor_projeto, num_projetos, vetor_conta, num_contas, vetor_fp_cont);
+                        if(controlo_p == 0) {
+                            num_projetos++;
+                        }
                     } else {
                         printf("\nExcedeu o limite de projetos!\n");
                     }
@@ -246,7 +248,6 @@ int main() {
 
                     break;
                 case '3':
-                    printf("\n\tVoltar atras\n");
 
                     submenu_projeto_op = '0';
 
@@ -269,7 +270,7 @@ int main() {
 
             break;
         case '3':
-            printf("\n\tSUB-MENU - SERVICOS\n");
+            printf("\n\tSUB-MENU - SERVICOS");
             char submenu_servico_op;
             char resposta_submenu_servico;
 
@@ -295,7 +296,6 @@ int main() {
 
                     break;
                 case '3':
-                    printf("\n\tVoltar atras\n");
 
                     submenu_servico_op = '0';
 
@@ -318,7 +318,7 @@ int main() {
 
             break;
         case '4':
-            printf("\n\tSUB-MENU - CUSTOS\n");
+            printf("\n\tSUB-MENU - CUSTOS");
 
             char submenu_custo_op;
             char resposta_submenu_custo;
@@ -348,7 +348,6 @@ int main() {
 
                     break;
                 case '3':
-                    printf("\n\tVoltar atras\n");
 
                     submenu_custo_op = '0';
 
@@ -373,18 +372,23 @@ int main() {
         case '5':
             printf("\nEstatisticas\n");
 
+            printf("\n---------------------------------------");
             printf("\nProjeto com maior numero de servicos: ");
             projeto_mais_servicos(vetor_sp_cont);
+            printf("\n---------------------------------------");
 
             printf("\nFornecedor com maior numero de projetos: ");
             fornecedor_mais_projetos(vetor_fp_cont);
+            printf("\n---------------------------------------");
 
             printf("\nServicos mais utilizados: ");
             servicos_mais_utilizados(vetor_su_cont);
+            printf("\n---------------------------------------");
 
             printf("\nCusto total por projetos em cada conta: ");
             custo_projetos_pop(vetor_ctp_cont, vetor_custo, num_custos, vetor_projeto, num_projetos, vetor_servico, num_servicos);
             // A estatística de custo por tipo de servico para cada projeto em cada conta encontra-se e é mostrada dentro da função custo_projeto_pop.
+            printf("\n---------------------------------------");
 
             break;
         case '6':
@@ -427,7 +431,7 @@ char menu_principal(void) {
     char op;
 
     do {
-        printf("\n\t----- Menu de Opcoes -----\n\n");
+        printf("\n\n\t----- Menu de Opcoes -----\n\n");
         printf(" 1 - CONTAS\n");
         printf(" 2 - PROJETOS\n");
         printf(" 3 - SERVICOS\n");
@@ -455,6 +459,7 @@ char submenu_contas(void) {
         printf("|0 - Sair                       |\n");
         printf("|------------------------------ |\n");
         fflush(stdin);
+        printf("\n\tSelecione uma opcao -> ");
         scanf(" %c", &op);
     } while(op < '0' && op > '3');
 
@@ -472,6 +477,7 @@ char submenu_servicos(void) {
         printf("|0 - Sair                        |\n");
         printf("|--------------------------------|\n");
         fflush(stdin);
+        printf("\n\tSelecione uma opcao -> ");
         scanf(" %c", &op);
     } while(op < '0' && op > '3');
 
@@ -644,8 +650,8 @@ void mostrar_dados_servico(servico s_vetor[], int s_numero) {
     }
 }
 
-void ler_dados_projeto(projeto p_vetor[], int p_numero, conta c_vetor[], int c_numero, fp_cont fp_vetor[]){
-    int id_conta, flag = 0;
+int ler_dados_projeto(projeto p_vetor[], int p_numero, conta c_vetor[], int c_numero, fp_cont fp_vetor[]){
+    int id_conta, flag = 0, resposta = 0;
 
     p_vetor[p_numero].id_projeto = p_numero;
 
@@ -695,7 +701,10 @@ void ler_dados_projeto(projeto p_vetor[], int p_numero, conta c_vetor[], int c_n
        
     } else if(flag == 0) {
         printf("\nConta não existente!\n");
+        resposta = 1;
     }
+
+    return resposta;
 }
 
 int validar_data(int dia, int mes, int ano) {
@@ -942,12 +951,12 @@ void projeto_mais_servicos(sp_cont vetor_sp[]) {
     }
 
     if(id_projeto == -1) {
-        printf("\nNao existem servicos associados a projetos!\n");
+        printf("\n  -Nao existem servicos associados a projetos!\n");
     } else {
         if(multiplos_maximos == -1) {
-            printf("\nID do projeto: %d\nNumero de servicos: %d\n", id_projeto, maior_numero_servicos);
+            printf("\n  -ID do projeto: %d\n  -Numero de servicos: %d\n", id_projeto, maior_numero_servicos);
         } else {
-            printf("\nNão existe um projeto com um numero superior de servicos\n");
+            printf("\n  -Não existe um projeto com um numero superior de servicos\n");
         }
     }
 }
@@ -997,15 +1006,15 @@ void fornecedor_mais_projetos(fp_cont vetor_fp[]) {
     }
 
     if(strcmp(nome, "\0") == 0) {
-        printf("\nNao existem fornecedores com projetos associados!\n");
+        printf("\n  -Nao existem fornecedores com projetos associados!\n");
     } else {
         if(multiplos_maximos == -1) {
             for(int i = 0; i < 30; i++) {
                 nome[i] = toupper(nome[i]);
             }
-            printf("\nNome do fornecedor: %s\nNumero de projetos: %d\n", nome, maior_numero_projetos);
+            printf("\n  -Nome do fornecedor: %s\n  -Numero de projetos: %d\n", nome, maior_numero_projetos);
         } else {
-            printf("\nNão existe um fornecedor com um numero superior de projetos\n");
+            printf("\n  -Não existe um fornecedor com um numero superior de projetos\n");
         }
     }
 }
@@ -1055,15 +1064,15 @@ void servicos_mais_utilizados(su_cont vetor_su[]) {
     }
 
     if(strcmp(nome, "\0") == 0) {
-        printf("\nNao existem servicos a ser utilizados!\n");
+        printf("\n  -Nao existem servicos a ser utilizados!\n");
     } else {
         if(multiplos_maximos == -1) {
             for(int i = 0; i < 30; i++) {
                 nome[i] = toupper(nome[i]);
             }
-            printf("\nTipo de servico mais utilizado: %s\nNumero de utilizacoes: %d\n", nome, maior_numero_servicos);
+            printf("\n  -Tipo de servico mais utilizado: %s\nNumero de utilizacoes: %d\n", nome, maior_numero_servicos);
         } else {
-            printf("\nNao existe um servico com um numero de utilizacoes superior\n");
+            printf("\n  -Nao existe um servico com um numero superior de utilizacoes\n");
         }
 
         printf("\n\nTotal de utilizacoes de todos os servicos: ");
@@ -1184,31 +1193,32 @@ void custo_projetos_pop(ctp_cont ctp_vetor[], custo custo_vetor[], int custo_num
 
     for(int i = 0; i < NUM_MAX_CONTAS; i++) {
         if(ctp_vetor[i].id_conta != -1) {
-            printf("\n----------------------------------------");
+            printf("\n\n++++++++++++++++++++++++");
             printf("\nID da conta: %d", ctp_vetor[i].id_conta);
         }
         for(int j = 0; j < NUM_MAX_PROJETOS; j++) {
             if(ctp_vetor[i].projeto[j].id_projeto != -1) {
-                printf("\nID do projeto: %d", ctp_vetor[i].projeto[j].id_projeto);
-                printf("\nCusto total: %.2f $\n", ctp_vetor[i].projeto[j].custo);
+                printf("\n  -ID do projeto: %d", ctp_vetor[i].projeto[j].id_projeto);
+                printf("\n  -Custo total: %.2f $\n", ctp_vetor[i].projeto[j].custo);
             }
         }
     }
+    printf("\n---------------------------------------");
 
     printf("\nCusto p/servico, p/projeto em cada conta: ");
     for(int i = 0; i < NUM_MAX_CONTAS; i++) {
         if(ctp_vetor[i].id_conta != -1) {
-            printf("\n----------------------------------------");
+            printf("\n\n++++++++++++++++++++++++");
             printf("\nID da conta: %d", ctp_vetor[i].id_conta);
         }
         for(int j = 0; j < NUM_MAX_PROJETOS; j++) {
             if(ctp_vetor[i].projeto[j].id_projeto != -1) {
-                printf("\nID do projeto: %d", ctp_vetor[i].projeto[j].id_projeto);
+                printf("\n -ID do projeto: %d", ctp_vetor[i].projeto[j].id_projeto);
 
                 for(int h = 0; h < NUM_MAX_SERVICOS; h++) {
                     if(strcmp(ctp_vetor[i].projeto[j].servico_custo[h].tipo_servico, "\0") != 0) {
-                        printf("\n  -Tipo de servico: %s\n", ctp_vetor[i].projeto[j].servico_custo[h].tipo_servico);
-                        printf("\n  -Custo: %.2f $\n", ctp_vetor[i].projeto[j].servico_custo[h].custo);
+                        printf("\n  -Tipo de servico: %s", ctp_vetor[i].projeto[j].servico_custo[h].tipo_servico);
+                        printf("\n  -Custo: %.2f $", ctp_vetor[i].projeto[j].servico_custo[h].custo);
                     }
                 }
             }
