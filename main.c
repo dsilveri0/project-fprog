@@ -78,24 +78,19 @@ typedef struct {
 } su_cont;
 
 typedef struct {
-    int id_projeto;
-    float custo;
-} ctp_cont_aux;
-
-typedef struct {
     char tipo_servico[30];
     float custo;
 } sc_cont;
 
 typedef struct {
     int id_projeto;
-    sc_cont s_custo;
-} psc_cont;
+    float custo;
+    sc_cont servico_custo[NUM_MAX_CUSTOS];
+} ctp_cont_aux;
 
 typedef struct {
     int id_conta;
     ctp_cont_aux projeto[NUM_MAX_PROJETOS];
-    psc_cont servico[];
 } ctp_cont;
 
 // Funções para menus e submenus
@@ -125,8 +120,8 @@ int validar_data(int, int, int);
 void servicos_projeto_cont(sp_cont[], int);
 void fornecedor_projeto_cont(fp_cont[], char[]);
 void servicos_utilizados_cont(su_cont[], char[]);
-void custo_projeto_cont(ctp_cont[], int, int, float);
-void custo_projetos_pop(ctp_cont[], custo[], int, projeto[], int);
+void custo_projeto_cont(ctp_cont[], int, int, float, char[]);
+void custo_projetos_pop(ctp_cont[], custo[], int, projeto[], int, servico[], int);
 
 // Funções para Estatísticas
 void projeto_mais_servicos(sp_cont[]);
@@ -386,7 +381,7 @@ int main() {
             servicos_mais_utilizados(vetor_su_cont);
 
             printf("\nCusto total por projetos em cada conta: ");
-            custo_projetos_pop(vetor_ctp_cont, vetor_custo, num_custos, vetor_projeto, num_projetos);
+            custo_projetos_pop(vetor_ctp_cont, vetor_custo, num_custos, vetor_projeto, num_projetos, vetor_servico, num_servicos);
 
             break;
         case '6':
@@ -1042,19 +1037,27 @@ void servicos_mais_utilizados(su_cont vetor_su[]) {
     }
 }
 /*
+
+typedef struct {
+    char tipo_servico[30];
+    float custo;
+} sc_cont;
+
 typedef struct {
     int id_projeto;
     float custo;
+    sc_cont servico_custo[NUM_MAX_CUSTOS];
 } ctp_cont_aux;
 
 typedef struct {
     int id_conta;
-    ctp_cont_aux projeto[];
+    ctp_cont_aux projeto[NUM_MAX_PROJETOS];
 } ctp_cont;
- */
 
-void custo_projeto_cont(ctp_cont vetor_ctp[], int id_conta, int id_projeto, float custo_projeto) {
-    int flag = 0, flag_c = 0, flag_p = 0;
+*/
+
+void custo_projeto_cont(ctp_cont vetor_ctp[], int id_conta, int id_projeto, float custo_projeto, char tipo_servico[]) {
+    int flag = 0, flag_c = 0, flag_p = 0, flag_s = 0;
     int indice_conta = -1;
 
     // Quando já existe conta e projeto, é somado o custo do projeto.
@@ -1067,6 +1070,21 @@ void custo_projeto_cont(ctp_cont vetor_ctp[], int id_conta, int id_projeto, floa
                 if (vetor_ctp[i].projeto[j].id_projeto == id_projeto) {
                     vetor_ctp[i].projeto[j].custo += custo_projeto;
                     flag_p = 1;
+
+                    for(int h = 0; h < NUM_MAX_SERVICOS; h++) {
+                        if(strcmp(vetor_ctp[i].projeto[j].servico_custo[h].tipo_servico, tipo_servico) == 0) {
+                            vetor_ctp[i].projeto[j].servico_custo[h].custo += custo_projeto;
+                            flag_s = 1;
+                        }
+                        if(flag_s == 0 && h == NUM_MAX_SERVICOS-1) {
+                            for(int k = 0; k < NUM_MAX_SERVICOS; k++) {
+                                if(strcmp(vetor_ctp[i].projeto[j].servico_custo[h].tipo_servico, "\0") == 0) {
+                                    vetor_ctp[i].projeto[j].servico_custo[k].custo = custo_projeto;
+                                    strcpy(vetor_ctp[i].projeto[j].servico_custo[k].tipo_servico, tipo_servico);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1085,6 +1103,8 @@ void custo_projeto_cont(ctp_cont vetor_ctp[], int id_conta, int id_projeto, floa
                         flag = 2;
                     }
                 }
+                vetor_ctp[i].projeto[0].servico_custo[0].custo = custo_projeto;
+                strcpy(vetor_ctp[i].projeto[0].servico_custo[0].tipo_servico, tipo_servico);
             }
         }
     }
@@ -1094,27 +1114,42 @@ void custo_projeto_cont(ctp_cont vetor_ctp[], int id_conta, int id_projeto, floa
             if (vetor_ctp[indice_conta].projeto[i].id_projeto == -1 && flag == 0) {
                 vetor_ctp[indice_conta].projeto[i].id_projeto = id_projeto;
                 vetor_ctp[indice_conta].projeto[i].custo = custo_projeto;
+                vetor_ctp[indice_conta].projeto[i].servico_custo[0].custo = custo_projeto;
+                strcpy(vetor_ctp[indice_conta].projeto[i].servico_custo[0].tipo_servico, tipo_servico);
                 flag = 1;
             }
         }
     }
 }
-
-void custo_projetos_pop(ctp_cont ctp_vetor[], custo custo_vetor[], int custo_numero, projeto p_vetor[], int p_numero) {
-    int id_conta, id_projeto;
+void custo_projetos_pop(ctp_cont ctp_vetor[], custo custo_vetor[], int custo_numero, projeto p_vetor[], int p_numero, servico s_vetor[], int s_numero) {
+    int id_conta, id_projeto, id_servico;
     float custo;
+    char tipo_servico[30] = {'\0'};
 
+    // Inicialização do vetor
     for(int i = 0; i < NUM_MAX_CONTAS; i++) {
         ctp_vetor[i].id_conta = -1;
 
         for(int j = 0; j < NUM_MAX_PROJETOS; j++) {
             ctp_vetor[i].projeto[j].id_projeto = -1;
+
+            for(int h = 0; h < NUM_MAX_SERVICOS; h++) {
+                strcpy(ctp_vetor[i].projeto[j].servico_custo[h].tipo_servico, "\0");
+            }
         }
     }
+    // ----------------------
 
     for(int i = 0; i < custo_numero; i++) {
         id_projeto = custo_vetor[i].id_do_projeto;
+        id_servico = custo_vetor[i].id_do_servico;
         custo = custo_vetor[i].valor_pago;
+
+        for(int h = 0; h < s_numero; h++) {
+            if(id_servico == s_vetor[h].id_servico) {
+                strcpy(tipo_servico, s_vetor[h].tipo_servico);
+            }
+        }
 
         for(int j = 0; j < p_numero; j++) {
             if(p_vetor[j].id_projeto == id_projeto) {
@@ -1122,7 +1157,7 @@ void custo_projetos_pop(ctp_cont ctp_vetor[], custo custo_vetor[], int custo_num
             }
         }
 
-        custo_projeto_cont(ctp_vetor, id_conta, id_projeto, custo);
+        custo_projeto_cont(ctp_vetor, id_conta, id_projeto, custo, tipo_servico);
     }
 
     for(int i = 0; i < NUM_MAX_CONTAS; i++) {
