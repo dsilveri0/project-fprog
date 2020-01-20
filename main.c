@@ -128,8 +128,6 @@ void custo_projetos_pop(ctp_cont[], custo[], int, projeto[], int, servico[], int
 void projeto_mais_servicos(sp_cont[]);
 void fornecedor_mais_projetos(fp_cont[]);
 void servicos_mais_utilizados(su_cont[]);
-void custo_total_projeto(ctp_cont[]);
-void custo_tipo_servico(custo[], int, servico[], int, projeto[], int);
 
 // Funções para ficheiros
 void gravar_dados_ficheiro(conta[], int, projeto[], int, servico[], int, custo[], int, sp_cont[], fp_cont[], su_cont[]);
